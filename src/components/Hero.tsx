@@ -114,15 +114,15 @@ export const Hero = () => {
             <div className="relative h-[600px] lg:h-[700px] pointer-events-none">
               {/* Rock 1 — big center */}
               <div className="absolute top-[5%] right-[5%] w-[340px] float-1 drop-shadow-2xl z-10 pointer-events-auto cursor-pointer">
-                <img src="/rocks.png" alt="Mossy ecosystem rock" className="w-full h-full object-contain" />
+                <img src="/rocks.png" alt="Mossy ecosystem rock" className="w-full h-full object-contain mix-blend-screen" />
               </div>
               {/* Rock 2 — bottom left offset */}
               <div className="absolute bottom-[5%] left-[0%] w-[200px] float-2 drop-shadow-2xl z-0 opacity-80 pointer-events-auto cursor-pointer">
-                <img src="/rock-left.png" alt="Gray rock" className="w-full h-full object-contain" />
+                <img src="/rock-left.png" alt="Gray rock" className="w-full h-full object-contain mix-blend-screen" />
               </div>
               {/* Rock 3 — small top accent */}
               <div className="absolute top-[30%] left-[10%] w-[130px] float-1 drop-shadow-2xl opacity-70 pointer-events-auto cursor-pointer" style={{ animationDelay: '2s' }}>
-                <img src="/rock-right.png" alt="Accent rock" className="w-full h-full object-contain" />
+                <img src="/rock-right.png" alt="Accent rock" className="w-full h-full object-contain mix-blend-screen" />
               </div>
 
               <motion.div

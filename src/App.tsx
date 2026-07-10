@@ -4,6 +4,7 @@ import { Hero }              from './components/Hero'
 import { StorySection }      from './components/StorySection'
 import { ForestBanner }      from './components/ForestBanner'
 import { ProductGrid }       from './components/ProductGrid'
+import { MarqueeDivider }    from './components/MarqueeDivider'
 import { DiagramSection }    from './components/DiagramSection'
 import { SolutionsSection }  from './components/SolutionsSection'
 import { TrustProblem }      from './components/TrustProblem'
@@ -48,6 +49,7 @@ function App() {
       <DiagramSection />
       
       {/* ── WHITE / LIGHT SECTIONS ─────────────────────────────────── */}
+      <MarqueeDivider />
       <SolutionsSection />
       <TrustProblem />
       <RedefiningSection />

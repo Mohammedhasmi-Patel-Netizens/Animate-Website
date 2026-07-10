@@ -73,105 +73,96 @@ const SatelliteSVG = () => (
 
 export const DiagramSection = () => {
   const containerRef = useRef<HTMLDivElement>(null)
-  const leftContentRef = useRef<HTMLDivElement>(null)
-  const tagsRef = useRef<HTMLDivElement>(null)
-  const diagramsRef = useRef<HTMLDivElement>(null)
 
   useGSAP(() => {
-    // Left side content stagger
-    const leftElements = leftContentRef.current?.children ? Array.from(leftContentRef.current.children) : []
-    gsap.fromTo(leftElements,
-      { opacity: 0, x: -50 },
-      {
-        opacity: 1, x: 0,
-        duration: 1,
-        stagger: 0.15,
-        ease: 'power3.out',
-        scrollTrigger: {
-          trigger: containerRef.current,
-          start: 'top 75%',
-        }
-      }
-    )
+    if (!containerRef.current) return
+    const q = gsap.utils.selector(containerRef.current)
 
-    // Tags stagger
-    const tags = tagsRef.current?.children ? Array.from(tagsRef.current.children) : []
-    gsap.fromTo(tags,
-      { opacity: 0, y: 20 },
-      {
-        opacity: 1, y: 0,
-        duration: 0.8,
-        stagger: 0.1,
-        ease: 'power2.out',
-        scrollTrigger: {
-          trigger: leftContentRef.current,
-          start: 'top 70%',
-        }
-      }
-    )
+    // Set initial states before timeline begins
+    gsap.set(q('.left-elem'), { opacity: 0, x: -50, filter: 'blur(10px)' })
+    gsap.set(q('.pill-tag'), { opacity: 0, scale: 0.5, y: 20 })
+    gsap.set(q('.diagram-card'), { opacity: 0, y: 150, z: -300, rotateX: 45, scale: 0.7 })
 
-    // Diagram cards stagger and parallax
-    const diagrams = diagramsRef.current?.children ? Array.from(diagramsRef.current.children) : []
-    gsap.fromTo(diagrams,
-      { opacity: 0, y: 100, rotateY: -15 },
-      {
-        opacity: 1, y: 0, rotateY: 0,
-        duration: 1.2,
-        stagger: 0.2,
-        ease: 'power3.out',
-        scrollTrigger: {
-          trigger: containerRef.current,
-          start: 'top 70%',
-        }
+    // Master pinned scrubbing timeline
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: containerRef.current,
+        start: 'top top',
+        end: '+=150%', // Pin the section for 1.5 viewport heights
+        pin: true,
+        scrub: 1, // Smooth interaction
       }
-    )
-
-    // Independent parallax for the diagrams
-    diagrams.forEach((diagram, i) => {
-      gsap.to(diagram, {
-        y: i === 1 ? -40 : -80, // Middle one floats differently
-        ease: 'none',
-        scrollTrigger: {
-          trigger: containerRef.current,
-          start: 'top bottom',
-          end: 'bottom top',
-          scrub: true,
-        }
-      })
     })
+
+    // Phase 1: Left text unblurs and slides in sequentially
+    tl.to(q('.left-elem'), {
+      opacity: 1,
+      x: 0,
+      filter: 'blur(0px)',
+      stagger: 0.1,
+      duration: 1,
+      ease: 'power2.out'
+    }, 0)
+
+    // Phase 2: Pill tags pop in rapidly
+    tl.to(q('.pill-tag'), {
+      opacity: 1,
+      scale: 1,
+      y: 0,
+      stagger: 0.05,
+      duration: 0.5,
+      ease: 'back.out(1.5)'
+    }, 0.5)
+
+    // Phase 3: The SVG diagram cards fly into existence, one by one
+    tl.to(q('.diagram-card'), {
+      opacity: 1,
+      y: 0,
+      z: 0,
+      rotateX: 0,
+      scale: 1,
+      stagger: 0.3,
+      duration: 1.5,
+      ease: 'power3.out'
+    }, 0.8)
+
+    // Phase 4: A subtle parallax fan-out effect as you complete the scroll
+    tl.to(q('.diagram-card')[0], { y: -20, rotateZ: -3, duration: 1 }, 2)
+      .to(q('.diagram-card')[1], { y: 10, rotateZ: 0, duration: 1 }, 2)
+      .to(q('.diagram-card')[2], { y: -20, rotateZ: 3, duration: 1 }, 2)
 
   }, { scope: containerRef })
 
   return (
-    <section ref={containerRef} className="relative z-10 bg-[#0a0a0a] py-32 border-t border-white/[0.06] perspective-[1000px]">
-      <div className="max-w-[1400px] mx-auto px-8 md:px-16">
+    <section ref={containerRef} className="relative z-10 bg-[#0a0a0a] h-screen w-full flex items-center overflow-hidden border-t border-white/[0.06] perspective-[1500px]">
+      <div className="w-full max-w-[1400px] mx-auto px-8 md:px-16 flex flex-col justify-center h-full">
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
 
           {/* ── LEFT TEXT ───────────────────────────────────────────── */}
           <div>
-            <div ref={leftContentRef}>
-              <span className="text-[10px] font-mono tracking-[0.28em] text-white/30 uppercase mb-10 block">
+            <div>
+              <span className="left-elem text-[10px] font-mono tracking-[0.28em] text-white/30 uppercase mb-10 block will-change-transform origin-left">
                 03 / Technology
               </span>
 
-              <h2 className="text-[clamp(2rem,4vw,3.4rem)] font-bold tracking-[-0.03em] leading-[1.1] text-white mb-8">
+              <h2 className="left-elem text-[clamp(2rem,4vw,3.4rem)] font-bold tracking-[-0.03em] leading-[1.1] text-white mb-8 will-change-transform origin-left">
                 Scientific Rigor.
                 <br />
-                <span className="text-white/40">Commercial Precision.</span>
+                <span className="text-[#a3e635]">Commercial Precision.</span>
                 <br />
                 Unmatched Trust.
               </h2>
 
-              <p className="text-[14.5px] leading-[1.8] text-white/40 max-w-[440px] mb-12">
+              <p className="left-elem text-[14.5px] leading-[1.8] text-white/40 max-w-[440px] mb-12 will-change-transform origin-left">
                 We're the first to bring Atmospheric-Based Digital MRV to corporate climate action—turning real-world emissions data into verified insight your board and regulators trust.
               </p>
             </div>
 
             {/* Pill tags */}
-            <div ref={tagsRef} className="flex flex-wrap gap-3">
+            <div className="flex flex-wrap gap-3">
               {['EPA-Standard', 'NOAA Sensors', 'Blockchain MRV', 'ISO 14064'].map((tag) => (
-                <span key={tag} className="px-4 py-1.5 rounded-full border border-white/10 text-[10.5px] font-mono tracking-wider text-white/40 hover:border-[#a3e635]/40 hover:text-[#a3e635] transition-all duration-300 cursor-default">
+                <span key={tag} className="pill-tag px-4 py-1.5 rounded-full border border-white/10 text-[10.5px] font-mono tracking-wider text-white/40 hover:border-[#a3e635] hover:text-[#a3e635] hover:shadow-[0_0_15px_rgba(163,230,53,0.3)] hover:scale-105 transition-all duration-300 cursor-default will-change-transform">
                   {tag}
                 </span>
               ))}
@@ -179,7 +170,7 @@ export const DiagramSection = () => {
           </div>
 
           {/* ── RIGHT: THREE SVG DIAGRAMS ───────────────────────────── */}
-          <div ref={diagramsRef} className="grid grid-cols-3 gap-4 will-change-transform">
+          <div className="grid grid-cols-3 gap-4 perspective-[1000px]">
             {[
               { Svg: TowerSVG,      label: 'Flux Tower' },
               { Svg: BlockchainSVG, label: 'Blockchain MRV' },
@@ -187,11 +178,11 @@ export const DiagramSection = () => {
             ].map(({ Svg, label }, i) => (
               <div
                 key={label}
-                className="glass rounded-2xl p-6 flex flex-col items-center gap-4 will-change-transform"
+                className="diagram-card glass rounded-2xl p-6 flex flex-col items-center justify-center gap-4 will-change-transform transform-gpu shadow-2xl hover:bg-white/[0.04] transition-colors duration-500"
               >
                 <motion.svg
                   viewBox={i === 1 ? '0 0 260 220' : '0 0 200 300'}
-                  className="w-full h-32 md:h-40"
+                  className="w-full h-24 md:h-36 drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]"
                   fill="none"
                   stroke="white"
                   strokeWidth="1.5"
@@ -202,7 +193,7 @@ export const DiagramSection = () => {
                 >
                   <Svg />
                 </motion.svg>
-                <span className="text-[9px] font-mono tracking-[0.2em] text-white/25 uppercase text-center">{label}</span>
+                <span className="text-[9px] font-mono tracking-[0.2em] text-white/40 uppercase text-center">{label}</span>
               </div>
             ))}
           </div>
