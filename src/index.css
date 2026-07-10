@@ -1,0 +1,48 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", system-ui, sans-serif;
+  --font-serif: "Playfair Display", Georgia, serif;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  background: linear-gradient(to bottom, #020f0a, #050806); /* Very deep forest green gradient */
+  color: white;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+.bg-grid-pattern {
+  background-image: 
+    linear-gradient(to right, rgba(255,255,255,0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255,255,255,0.05) 1px, transparent 1px);
+  background-size: 50px 50px;
+}
+
+.glass-panel {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+}
+
+.edge-fade-vignette {
+  mask-image: radial-gradient(ellipse at center, black 40%, transparent 80%);
+  -webkit-mask-image: radial-gradient(ellipse at center, black 40%, transparent 80%);
+}
+
+.hero-text {
+  font-family: var(--font-sans);
+  font-weight: 500;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.text-gradient {
+  background: linear-gradient(180deg, #FFFFFF 0%, rgba(255,255,255,0.7) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
