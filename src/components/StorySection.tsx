@@ -1,75 +1,148 @@
-import { motion, useScroll, useTransform } from 'framer-motion'
 import { useRef } from 'react'
+import gsap from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { useGSAP } from '@gsap/react'
+
+gsap.registerPlugin(ScrollTrigger)
 
 export const StorySection = () => {
-  const targetRef = useRef<HTMLDivElement>(null)
-  
-  const { scrollYProgress } = useScroll({
-    target: targetRef,
-    offset: ["start end", "end start"]
-  })
+  const containerRef = useRef<HTMLDivElement>(null)
+  const textRef = useRef<HTMLDivElement>(null)
+  const rockCenterRef = useRef<HTMLImageElement>(null)
+  const rockLeftRef = useRef<HTMLImageElement>(null)
+  const rockRightRef = useRef<HTMLImageElement>(null)
+  const glowRef = useRef<HTMLDivElement>(null)
 
-  // The center element rotates 360 degrees and rises based on scroll
-  const rotate = useTransform(scrollYProgress, [0, 1], [0, 360])
-  const scale = useTransform(scrollYProgress, [0, 0.5, 1], [0.8, 1, 0.8])
-  const yRock = useTransform(scrollYProgress, [0, 0.3], [400, 0])
-  
+  useGSAP(() => {
+    // A master timeline scrubbed by the scroll position
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: containerRef.current,
+        start: 'top top',
+        end: 'bottom bottom',
+        scrub: 1, // Smooth scrubbing
+      },
+    })
+
+    // Setup initial states
+    gsap.set(textRef.current, { scale: 0.3, opacity: 0, filter: 'blur(20px)' })
+    gsap.set(rockCenterRef.current, { scale: 0.1, opacity: 0, y: 300, filter: 'blur(20px)', rotate: 0 })
+    gsap.set(rockLeftRef.current, { scale: 0.3, opacity: 0, x: -200, y: 200, filter: 'blur(10px)' })
+    gsap.set(rockRightRef.current, { scale: 0.3, opacity: 0, x: 200, y: 200, filter: 'blur(10px)' })
+    gsap.set(glowRef.current, { scale: 0.5, opacity: 0 })
+
+    // --- PHASE 1: Text zooms into focus ---
+    tl.to(textRef.current, {
+      scale: 1,
+      opacity: 1,
+      filter: 'blur(0px)',
+      duration: 2,
+      ease: 'power2.out',
+    })
+      .to(glowRef.current, { opacity: 1, scale: 1, duration: 2 }, '<')
+
+    // --- PHASE 2: Text zooms OUT past the camera, Rock enters ---
+    tl.to(textRef.current, {
+      scale: 2.5,
+      opacity: 0,
+      filter: 'blur(15px)',
+      duration: 2,
+      ease: 'power2.in',
+    })
+      .to(rockCenterRef.current, {
+        scale: 1,
+        opacity: 1,
+        y: 0,
+        filter: 'blur(0px)',
+        rotate: 180,
+        duration: 2.5,
+        ease: 'power2.out',
+      }, '<+=0.5') // Start slightly after text starts zooming out
+
+    // --- PHASE 3: Rock gets massive (3D push), side rocks fly in ---
+    tl.to(rockCenterRef.current, {
+      scale: 2.5,
+      rotate: 360,
+      duration: 3,
+      ease: 'none',
+    })
+      .to(rockLeftRef.current, {
+        scale: 1.8,
+        opacity: 0.6,
+        x: 0,
+        y: -100,
+        filter: 'blur(2px)',
+        duration: 3,
+        ease: 'none',
+      }, '<')
+      .to(rockRightRef.current, {
+        scale: 2.2,
+        opacity: 0.5,
+        x: 0,
+        y: -200,
+        filter: 'blur(4px)',
+        duration: 3,
+        ease: 'none',
+      }, '<')
+
+    // --- PHASE 4: Everything shrinks back down to transition out ---
+    tl.to([rockCenterRef.current, rockLeftRef.current, rockRightRef.current, glowRef.current], {
+      scale: 0.5,
+      opacity: 0,
+      filter: 'blur(15px)',
+      duration: 1.5,
+      ease: 'power2.in',
+    })
+
+  }, { scope: containerRef })
+
   return (
-    <section ref={targetRef} className="relative min-h-[150vh] bg-[#020f0a] flex items-center justify-center">
-      <div className="sticky top-0 h-screen w-full flex items-center justify-center overflow-hidden">
-        
-        {/* Background Glow */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] bg-[#a3e635] blur-[120px] opacity-10 rounded-full z-0 pointer-events-none" />
+    <section ref={containerRef} className="relative h-[400vh] bg-[#0a0a0a] border-t border-white/[0.06]">
+      <div className="sticky top-0 h-screen w-full flex items-center justify-center overflow-hidden perspective-[1000px]">
 
-        {/* Story Texts (Z-10: Behind the rock) */}
-        <div className="absolute inset-0 z-10 pointer-events-none flex items-center justify-center w-full px-6 text-center drop-shadow-md">
-          <motion.div 
-            initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-10%" }}
-            transition={{ duration: 1 }}
-            className="max-w-5xl mx-auto flex flex-col items-center"
-          >
-            <div className="flex justify-center mb-6">
-              <span className="px-4 py-1.5 bg-[#a3e635]/10 border border-[#a3e635]/30 rounded text-[11px] font-bold tracking-[0.2em] text-[#a3e635] uppercase backdrop-blur-sm">
-                OUR STORY
-              </span>
-            </div>
-            <h3 className="text-4xl md:text-6xl lg:text-[5.5rem] font-serif mb-8 leading-[1.05] tracking-tight">
-              From Data Chaos to <br/>
-              <span className="italic">Science-Backed, </span><br/>
-              <span className="italic">Actionable Insights</span>
-            </h3>
-            <p className="text-lg md:text-[21px] text-white/80 max-w-2xl mx-auto leading-relaxed mt-10">
-              A Breakthrough in Environmental Measurement, <br/>Built for Commercial Use.
+        {/* Ambient glow */}
+        <div
+          ref={glowRef}
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[500px] bg-[#a3e635]/10 rounded-full blur-[160px] pointer-events-none"
+        />
+
+        {/* Text (behind rock) */}
+        <div className="absolute inset-0 z-10 flex items-center justify-center text-center px-6 pointer-events-none">
+          <div ref={textRef} className="max-w-4xl origin-center">
+            <span className="inline-block mb-6 px-4 py-1.5 rounded-full border border-[#a3e635]/25 text-[#a3e635] text-[9.5px] font-mono tracking-[0.24em] uppercase">
+              Our Story
+            </span>
+            <h2 className="text-[clamp(2.5rem,6vw,5rem)] font-bold leading-[1.06] tracking-[-0.03em] text-white mb-8">
+              From Data Chaos to<br />
+              <span className="text-[#a3e635]">Science-Backed,</span><br />
+              Actionable Insights
+            </h2>
+            <p className="text-[15px] text-white/35 max-w-xl mx-auto leading-relaxed">
+              A Breakthrough in Environmental Measurement, Built for Commercial Use.
             </p>
-          </motion.div>
+          </div>
         </div>
 
-        {/* Central Rotating Rock (Z-20: In front of the text) */}
-        <motion.div 
-          style={{ rotate, scale, y: yRock }}
-          className="absolute z-20 flex items-center justify-center w-[600px] h-[600px] md:w-[800px] md:h-[800px]"
-        >
-          <img 
-            src="/rock-center.png" 
-            alt="Rotating 3D Rock" 
-            className="w-full h-full object-contain mix-blend-normal drop-shadow-2xl opacity-90"
+        {/* Rotating center rock */}
+        <div className="absolute z-20 w-[500px] h-[500px] md:w-[700px] md:h-[700px] pointer-events-none flex items-center justify-center">
+          <img
+            ref={rockCenterRef}
+            src="/rock-center.png"
+            alt="Rotating ecosystem rock"
+            className="w-full h-full object-contain mix-blend-normal drop-shadow-2xl"
           />
-        </motion.div>
+        </div>
 
-        {/* Additional Floating Rocks in background */}
-        <motion.img 
+        <img
+          ref={rockLeftRef}
           src="/rock-left.png"
-          style={{ y: useTransform(scrollYProgress, [0, 1], [200, -400]) }}
-          className="absolute left-[5%] bottom-[10%] w-[300px] opacity-70 z-30 blur-[2px]"
+          className="absolute left-[4%] bottom-[10%] w-[260px] z-30"
         />
-        <motion.img 
+        <img
+          ref={rockRightRef}
           src="/rock-right.png"
-          style={{ y: useTransform(scrollYProgress, [0, 1], [-200, 400]) }}
-          className="absolute right-[5%] top-[20%] w-[250px] opacity-60 z-0 blur-[3px]"
+          className="absolute right-[4%] top-[15%] w-[200px] z-30"
         />
-
       </div>
     </section>
   )

@@ -1,52 +1,122 @@
-import { motion } from 'framer-motion'
+import { useRef } from 'react'
+import gsap from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { useGSAP } from '@gsap/react'
+
+gsap.registerPlugin(ScrollTrigger)
 
 export const SolutionsSection = () => {
+  const containerRef = useRef<HTMLDivElement>(null)
+  const headerRef = useRef<HTMLDivElement>(null)
+  const cardsRef = useRef<HTMLDivElement>(null)
+
+  useGSAP(() => {
+    // Header text staggered reveal
+    const headerElements = headerRef.current?.children ? Array.from(headerRef.current.children) : []
+    gsap.fromTo(headerElements,
+      { opacity: 0, y: 50 },
+      {
+        opacity: 1, y: 0,
+        duration: 1.2,
+        stagger: 0.15,
+        ease: 'power3.out',
+        scrollTrigger: {
+          trigger: containerRef.current,
+          start: 'top 75%',
+        }
+      }
+    )
+
+    // Bento cards 3D entrance and parallax
+    const cards = cardsRef.current?.children ? Array.from(cardsRef.current.children) : []
+    
+    gsap.fromTo(cards,
+      { opacity: 0, y: 150, scale: 0.9, rotateX: 10 },
+      {
+        opacity: 1, y: 0, scale: 1, rotateX: 0,
+        duration: 1.2,
+        stagger: 0.2,
+        ease: 'power3.out',
+        scrollTrigger: {
+          trigger: cardsRef.current,
+          start: 'top 85%',
+        }
+      }
+    )
+
+    // Parallax on the cards
+    cards.forEach((card, i) => {
+      gsap.to(card, {
+        y: i === 0 ? -40 : -80,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: containerRef.current,
+          start: 'top bottom',
+          end: 'bottom top',
+          scrub: true,
+        }
+      })
+    })
+
+  }, { scope: containerRef })
+
   return (
-    <section className="relative min-h-screen py-32 bg-[#F5F5F2] text-[#0A1F16] bg-grid-pattern-light z-20">
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="flex flex-col md:flex-row justify-between items-end mb-24 gap-8">
-          <motion.h2 
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-            className="text-5xl md:text-7xl font-serif tracking-tight max-w-2xl"
-          >
-            Comprehensive Ecosystem Solutions
-          </motion.h2>
-          <motion.p 
-            initial={{ opacity: 0, x: 30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 1, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-            className="text-lg text-[#0A1F16]/60 max-w-md pb-4"
-          >
-            End-to-end tools for verifying, tokenizing, and trading high-quality nature-based carbon credits.
-          </motion.p>
+    <section ref={containerRef} className="relative z-10 bg-white py-32 overflow-hidden perspective-[1000px]">
+      <div className="max-w-[1400px] mx-auto px-8 md:px-16">
+
+        {/* Header Content */}
+        <div ref={headerRef}>
+          <div className="mb-6">
+            <span className="text-[10px] font-mono tracking-[0.28em] text-[#a3e635] uppercase">
+              Our Solutions
+            </span>
+          </div>
+          <h2 className="text-[clamp(2.2rem,5vw,4rem)] font-bold tracking-[-0.03em] leading-[1.08] text-[#0a0a0a] max-w-[700px] mb-6">
+            Validating What the Ecosystem Does Naturally
+          </h2>
+          <p className="text-[15px] leading-[1.8] text-[#0a0a0a]/50 max-w-[520px] mb-20">
+            We deploy science-grade monitoring infrastructure to measure, report, 
+            and verify the carbon sequestration of natural ecosystems at unprecedented accuracy.
+          </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {[
-            { title: "Sensing", desc: "Real-time biospheric data collection via distributed IoT networks and satellite triangulation." },
-            { title: "Verification", desc: "Automated dMRV protocols ensuring strict adherence to global carbon standards." },
-            { title: "Tokenization", desc: "Minting fully traceable, high-integrity carbon credits on public ledgers." }
-          ].map((item, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ delay: i * 0.15, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-              className="group p-8 rounded-3xl bg-white border border-[#0A1F16]/5 hover:border-[#0A1F16]/20 hover:shadow-2xl hover:shadow-[#0A1F16]/5 transition-all duration-500 cursor-pointer overflow-hidden relative"
-            >
-              <div className="absolute top-0 right-0 p-6 opacity-0 group-hover:opacity-100 transition-opacity duration-500 text-[#A5D965]">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-              </div>
-              <h3 className="text-2xl font-serif mb-4 mt-12">{item.title}</h3>
-              <p className="text-[#0A1F16]/60 leading-relaxed">{item.desc}</p>
-            </motion.div>
-          ))}
+        {/* Bento grid */}
+        <div ref={cardsRef} className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          {/* Left: Dark photo card */}
+          <div className="relative rounded-3xl overflow-hidden h-[380px] group cursor-pointer will-change-transform">
+            <img
+              src="/leaves.png"
+              alt="Carbon Markets"
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a]/90 via-[#0a0a0a]/30 to-transparent" />
+            <div className="absolute bottom-0 left-0 right-0 p-8">
+              <h3 className="text-[1.5rem] md:text-[1.8rem] font-bold leading-[1.15] tracking-[-0.02em] text-white">
+                Carbon Markets Built on<br />Truth, Not Estimates.
+              </h3>
+            </div>
+          </div>
+
+          {/* Right: Lime green card */}
+          <div className="relative bg-[#a3e635] rounded-3xl p-10 h-[380px] flex flex-col justify-between overflow-hidden group cursor-pointer will-change-transform">
+            {/* Decorative circle */}
+            <div className="absolute -right-16 -bottom-16 w-64 h-64 rounded-full bg-white/15 group-hover:scale-110 transition-transform duration-700" />
+            
+            <span className="text-[10px] font-mono tracking-[0.24em] text-[#0a0a0a]/40 uppercase">
+              Enterprise Platform
+            </span>
+            <div className="relative z-10">
+              <h3 className="text-[1.5rem] md:text-[1.8rem] font-bold leading-[1.15] tracking-[-0.02em] text-[#0a0a0a] mb-4">
+                Real-World Emissions Data.<br />
+                Enterprise-Wide Climate Clarity.
+              </h3>
+              <p className="text-[13px] text-[#0a0a0a]/50 font-medium leading-relaxed max-w-[340px]">
+                Verified carbon intelligence for compliance, reporting, and strategic decision-making.
+              </p>
+            </div>
+          </div>
         </div>
+
       </div>
     </section>
   )

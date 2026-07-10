@@ -1,73 +1,113 @@
-import { useEffect, useState } from 'react'
-import { motion, useMotionValue, useSpring, AnimatePresence } from 'framer-motion'
-
-interface Ripple {
-  x: number;
-  y: number;
-  id: number;
-}
+import { useEffect, useRef } from 'react'
 
 export const WaterCursor = () => {
-  const cursorX = useMotionValue(-100)
-  const cursorY = useMotionValue(-100)
-  
-  // Spring config for a fluid, bouncy water droplet feel
-  const springConfig = { damping: 25, stiffness: 200, mass: 0.5 }
-  const cursorXSpring = useSpring(cursorX, springConfig)
-  const cursorYSpring = useSpring(cursorY, springConfig)
-
-  const [ripples, setRipples] = useState<Ripple[]>([])
+  const canvasRef = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
-    let lastTime = 0;
-    
-    const moveCursor = (e: MouseEvent) => {
-      // Offset by half of cursor width (32px / 2 = 16)
-      cursorX.set(e.clientX - 16)
-      cursorY.set(e.clientY - 16)
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
 
-      const now = Date.now();
-      // Only generate ripples when mouse is moving fast enough or periodically
-      if (now - lastTime > 60) { 
-        lastTime = now;
-        setRipples(prev => [...prev, { x: e.clientX, y: e.clientY, id: now }].slice(-10))
+    let width = window.innerWidth
+    let height = window.innerHeight
+    canvas.width = width
+    canvas.height = height
+
+    let particles: Array<{ x: number; y: number; vx: number; vy: number; life: number; maxLife: number; size: number }> = []
+
+    const addParticle = (x: number, y: number, dx: number, dy: number) => {
+      particles.push({
+        x,
+        y,
+        vx: dx * 0.05 + (Math.random() - 0.5) * 1,
+        vy: dy * 0.05 + (Math.random() - 0.5) * 1,
+        life: 1,
+        maxLife: Math.random() * 30 + 30,
+        size: Math.random() * 30 + 20
+      })
+    }
+
+    let mouse = { x: width / 2, y: height / 2 }
+    let lastMouse = { x: width / 2, y: height / 2 }
+
+    const onMouseMove = (e: MouseEvent) => {
+      lastMouse.x = mouse.x
+      lastMouse.y = mouse.y
+      mouse.x = e.clientX
+      mouse.y = e.clientY
+
+      const dx = mouse.x - lastMouse.x
+      const dy = mouse.y - lastMouse.y
+      const dist = Math.sqrt(dx * dx + dy * dy)
+      
+      if (dist > 2) {
+         // Add particles based on distance to create a continuous trail
+         const steps = Math.floor(dist / 5)
+         for (let i = 0; i < steps; i++) {
+           const px = lastMouse.x + (dx * (i / steps))
+           const py = lastMouse.y + (dy * (i / steps))
+           addParticle(px, py, dx, dy)
+         }
       }
     }
 
-    window.addEventListener('mousemove', moveCursor)
-    return () => window.removeEventListener('mousemove', moveCursor)
-  }, [cursorX, cursorY])
+    window.addEventListener('mousemove', onMouseMove)
+    window.addEventListener('resize', () => {
+      width = window.innerWidth
+      height = window.innerHeight
+      canvas.width = width
+      canvas.height = height
+    })
+
+    let animationFrameId: number
+
+    const render = () => {
+      // Create a slight fade effect for trails
+      ctx.clearRect(0, 0, width, height)
+      
+      for (let i = 0; i < particles.length; i++) {
+        let p = particles[i]
+        p.x += p.vx
+        p.y += p.vy
+        p.life -= 1
+        p.size += 0.8 // expand like a ripple
+        
+        if (p.life <= 0) {
+          particles.splice(i, 1)
+          i--
+          continue
+        }
+        
+        // Watery neon green color
+        const opacity = (p.life / p.maxLife) * 0.12
+        
+        ctx.beginPath()
+        const gradient = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.size)
+        gradient.addColorStop(0, `rgba(163, 230, 53, ${opacity})`)
+        gradient.addColorStop(0.5, `rgba(163, 230, 53, ${opacity * 0.5})`)
+        gradient.addColorStop(1, `rgba(163, 230, 53, 0)`)
+        
+        ctx.fillStyle = gradient
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2)
+        ctx.fill()
+      }
+
+      animationFrameId = requestAnimationFrame(render)
+    }
+    
+    render()
+
+    return () => {
+      window.removeEventListener('mousemove', onMouseMove)
+      cancelAnimationFrame(animationFrameId)
+    }
+  }, [])
 
   return (
-    <>
-      <div className="pointer-events-none fixed inset-0 z-50 overflow-hidden">
-        <AnimatePresence>
-          {ripples.map((ripple) => (
-            <motion.div
-              key={ripple.id}
-              initial={{ opacity: 0.4, scale: 0.2, borderWidth: "2px" }}
-              animate={{ opacity: 0, scale: 3, borderWidth: "0px" }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 1.2, ease: "easeOut" }}
-              className="absolute rounded-full border-[#a3e635] shadow-[0_0_10px_rgba(163,230,53,0.3)] bg-[#a3e635]/5 mix-blend-screen"
-              style={{
-                left: ripple.x - 24,
-                top: ripple.y - 24,
-                width: 48,
-                height: 48,
-              }}
-            />
-          ))}
-        </AnimatePresence>
-      </div>
-      
-      <motion.div
-        className="pointer-events-none fixed top-0 left-0 z-50 w-8 h-8 bg-white/10 rounded-full backdrop-blur-[2px] border border-white/30 shadow-[0_0_15px_rgba(163,230,53,0.2)] mix-blend-screen"
-        style={{
-          x: cursorXSpring,
-          y: cursorYSpring,
-        }}
-      />
-    </>
+    <canvas 
+      ref={canvasRef}
+      className="fixed inset-0 pointer-events-none z-[100] mix-blend-screen"
+    />
   )
 }
