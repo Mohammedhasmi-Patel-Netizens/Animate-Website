@@ -12,27 +12,36 @@ export const TrustProblem = () => {
   const lowerCardsRef = useRef<HTMLDivElement>(null)
 
   useGSAP(() => {
-    // --- Cinematic Pinned Scroll Scrubbing ---
+    // --- Cinematic Scroll Scrubbing ---
+    
+    // 1. Separate timeline for animations
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: containerRef.current,
-        start: 'top top',
-        end: '+=250%', // Pin for 2.5 viewport heights
-        pin: true,
-        scrub: 1.5, // Buttery smooth scrubbing
+        start: 'top 70%', // Start animating before pinning
+        end: '+=250%', 
+        scrub: 1.5,
       }
+    })
+
+    // 2. Separate trigger for pinning
+    ScrollTrigger.create({
+      trigger: containerRef.current,
+      start: 'top top',
+      end: '+=250%',
+      pin: true,
     })
 
     const topCards = cardsRef.current?.children ? Array.from(cardsRef.current.children) : []
     const bottomCards = lowerCardsRef.current?.children ? Array.from(lowerCardsRef.current.children) : []
     const textChildren = textRef.current?.children ? Array.from(textRef.current.children) : []
 
-    // 1. Initial States
+    // Initial States
     gsap.set(textChildren, { opacity: 0, y: 50, scale: 0.9, filter: 'blur(15px)' })
     gsap.set(topCards, { opacity: 0, y: -400, z: -800, rotateX: -60, rotateY: 'random(-20, 20)', scale: 0.5 })
     gsap.set(bottomCards, { opacity: 0, y: 400, z: -800, rotateX: 60, rotateY: 'random(-20, 20)', scale: 0.5 })
 
-    // 2. Phase 1: Text reveal
+    // Phase 1: Text reveal
     tl.to(textChildren, {
       opacity: 1, 
       y: 0, 
@@ -43,7 +52,7 @@ export const TrustProblem = () => {
       ease: 'power3.out',
     })
 
-    // 3. Phase 2: Top and Bottom Cards swoop in from 3D space
+    // Phase 2: Top and Bottom Cards swoop in
     tl.to(topCards, {
       opacity: 1,
       y: 0,
@@ -54,7 +63,7 @@ export const TrustProblem = () => {
       duration: 2,
       stagger: { amount: 0.8, from: "edges" },
       ease: 'power4.out',
-    }, '-=0.5') // overlap slightly with text
+    }, '-=0.5')
 
     tl.to(bottomCards, {
       opacity: 1,
@@ -66,16 +75,21 @@ export const TrustProblem = () => {
       duration: 2,
       stagger: { amount: 0.5, from: "center" },
       ease: 'power4.out',
-    }, '<') // start at exactly the same time as top cards
+    }, '<')
 
-    // 4. Phase 3: Majestic slow drift
+    // Phase 3: Majestic slow drift
     tl.to([...topCards, ...bottomCards], {
-      y: (i) => i % 2 === 0 ? -40 : 40, // subtle split drift
-      z: 50, // slight push towards camera
+      y: (i) => i % 2 === 0 ? -40 : 40,
+      z: 50,
       rotation: 'random(-2, 2)',
       duration: 2,
       ease: 'none',
     })
+
+    // Force a refresh
+    setTimeout(() => {
+      ScrollTrigger.refresh()
+    }, 100)
 
   }, { scope: containerRef })
 

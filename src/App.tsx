@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import { Preloader }         from './components/Preloader'
 import { Navbar }            from './components/Navbar'
 import { Hero }              from './components/Hero'
 import { StorySection }      from './components/StorySection'
@@ -40,6 +41,7 @@ function App() {
 
   return (
     <div className="bg-[#0a0a0a] text-white selection:bg-[#a3e635] selection:text-[#0a0a0a]">
+      <Preloader />
       <WaterCursor />
       <Navbar />
       

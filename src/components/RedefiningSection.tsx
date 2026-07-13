@@ -30,24 +30,33 @@ export const RedefiningSection = () => {
   const gridRef = useRef<HTMLDivElement>(null)
 
   useGSAP(() => {
-    // --- Cinematic Pinned Scroll Scrubbing ---
+    // --- Cinematic Scroll Scrubbing ---
+    
+    // 1. Separate timeline for animations
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: containerRef.current,
-        start: 'top top',
-        end: '+=200%', // Pin for 2 viewport heights
-        pin: true,
-        scrub: 1.5, // Buttery smooth scrubbing
+        start: 'top 70%', // Start animating before pinning
+        end: '+=200%', 
+        scrub: 1.5,
       }
+    })
+
+    // 2. Separate trigger for pinning
+    ScrollTrigger.create({
+      trigger: containerRef.current,
+      start: 'top top',
+      end: '+=200%',
+      pin: true,
     })
 
     const gridItems = gridRef.current?.children ? Array.from(gridRef.current.children) : []
 
-    // 1. Initial States
+    // Initial States
     gsap.set(headerRef.current, { opacity: 0, y: 100, scale: 1.1, filter: 'blur(15px)' })
-    gsap.set(gridItems, { opacity: 0, y: window.innerHeight, z: -400, rotateX: 30, scale: 0.8 })
+    gsap.set(gridItems, { opacity: 0, y: window.innerHeight * 0.8, z: -400, rotateX: 30, scale: 0.8 })
 
-    // 2. Phase 1: Header cinematic slam
+    // Phase 1: Header cinematic slam
     tl.to(headerRef.current, {
       opacity: 1, 
       y: 0, 
@@ -57,7 +66,7 @@ export const RedefiningSection = () => {
       ease: 'power4.out',
     })
 
-    // 3. Phase 2: Grid items swooping in 3D stagger
+    // Phase 2: Grid items swooping in 3D stagger
     tl.to(gridItems, {
       opacity: 1,
       y: 0,
@@ -69,12 +78,17 @@ export const RedefiningSection = () => {
       ease: 'power3.out',
     }, '-=0.5') // overlap with header
 
-    // 4. Phase 3: Gentle parallax drift to end
+    // Phase 3: Gentle parallax drift to end
     tl.to([headerRef.current, ...gridItems], {
       y: -40,
       duration: 1.5,
       ease: 'none',
     })
+
+    // Force a refresh
+    setTimeout(() => {
+      ScrollTrigger.refresh()
+    }, 100)
 
   }, { scope: containerRef })
 

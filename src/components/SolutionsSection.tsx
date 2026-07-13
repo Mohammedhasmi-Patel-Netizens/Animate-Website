@@ -26,25 +26,33 @@ export const SolutionsSection = () => {
 
     window.addEventListener('mousemove', handleMouseMove)
 
-    // --- Cinematic Pinned Scroll Scrubbing ---
+    // --- Cinematic Scroll Scrubbing ---
+    // 1. Separate timeline for animations (starts earlier so content is visible on anchor jump)
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: containerRef.current,
-        start: 'top top',
-        end: '+=200%', // Pin for 2 viewport heights
-        pin: true,
-        scrub: 1.5, // Buttery smooth scrubbing
+        start: 'top 70%', // Start animating before it pins
+        end: '+=250%', 
+        scrub: 1.5,
       }
+    })
+
+    // 2. Separate trigger strictly for pinning
+    ScrollTrigger.create({
+      trigger: containerRef.current,
+      start: 'top top',
+      end: '+=200%',
+      pin: true,
     })
 
     const headerElements = headerRef.current?.children ? Array.from(headerRef.current.children) : []
 
-    // 1. Initial States
+    // Initial States
     gsap.set(headerElements, { opacity: 0, y: 100, scale: 0.9, filter: 'blur(10px)' })
-    gsap.set(card1Ref.current, { opacity: 0, y: window.innerHeight, z: -500, rotateX: 45, rotateY: -15, scale: 0.8 })
-    gsap.set(card2Ref.current, { opacity: 0, y: window.innerHeight, z: -500, rotateX: 45, rotateY: 15, scale: 0.8 })
+    gsap.set(card1Ref.current, { opacity: 0, y: window.innerHeight * 0.8, z: -500, rotateX: 45, rotateY: -15, scale: 0.8 })
+    gsap.set(card2Ref.current, { opacity: 0, y: window.innerHeight * 0.8, z: -500, rotateX: 45, rotateY: 15, scale: 0.8 })
 
-    // 2. Animate Header In
+    // Animate Header In
     tl.to(headerElements, {
       opacity: 1,
       y: 0,
@@ -55,7 +63,7 @@ export const SolutionsSection = () => {
       ease: 'power3.out',
     })
 
-    // 3. Animate Card 1 (Left) In
+    // Animate Card 1 (Left) In
     tl.to(card1Ref.current, {
       opacity: 1,
       y: 0,
@@ -65,9 +73,9 @@ export const SolutionsSection = () => {
       scale: 1,
       duration: 1.5,
       ease: 'power4.out',
-    }, '-=0.5') // Overlap slightly with header
+    }, '-=0.5')
 
-    // 4. Animate Card 2 (Right) In
+    // Animate Card 2 (Right) In
     tl.to(card2Ref.current, {
       opacity: 1,
       y: 0,
@@ -77,9 +85,9 @@ export const SolutionsSection = () => {
       scale: 1,
       duration: 1.5,
       ease: 'power4.out',
-    }, '-=1.0') // Overlap with Card 1
+    }, '-=1.0')
 
-    // 5. Final subtle parallax push on scrub end
+    // Final subtle parallax push on scrub end
     tl.to([card1Ref.current, card2Ref.current], {
       y: -50,
       duration: 1,
@@ -98,11 +106,16 @@ export const SolutionsSection = () => {
       stagger: 0.6
     })
 
+    // Force a refresh to ensure pinned heights are calculated correctly
+    setTimeout(() => {
+      ScrollTrigger.refresh()
+    }, 100)
+
     return () => window.removeEventListener('mousemove', handleMouseMove)
   }, { scope: containerRef })
 
   return (
-    <section ref={containerRef} className="relative z-10 bg-[#f8f9fa] h-screen w-full flex items-center justify-center overflow-hidden perspective-[1200px]">
+    <section id="our-solutions" ref={containerRef} className="relative z-10 bg-[#f8f9fa] h-screen w-full flex items-center justify-center overflow-hidden perspective-[1200px]">
       
       {/* Light background ambient glows */}
       <div className="absolute top-0 -left-32 w-[600px] h-[600px] bg-[#a3e635]/15 rounded-full blur-[150px] pointer-events-none floating-orb-light" />

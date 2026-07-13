@@ -8,11 +8,44 @@ const navLinks = [
   { name: 'Footer', href: '#footer' },
 ]
 
+// Cinematic slow easing curve
+const easeInOutCubic = (t: number) => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2
+
 export const Navbar = () => {
   const [scrolled, setScrolled] = useState(false)
   const { scrollY } = useScroll()
 
   useMotionValueEvent(scrollY, 'change', (v) => setScrolled(v > 40))
+
+  const handleScrollTo = (target: string | number) => {
+    // @ts-ignore
+    if (window.lenis) {
+      let distance = 0
+
+      if (typeof target === 'number') {
+        distance = window.scrollY // If going to top, distance is current scroll pos
+      } else {
+        const el = document.querySelector(target)
+        if (el) distance = Math.abs(el.getBoundingClientRect().top)
+      }
+
+      // Balanced cinematic scrolling: max 3.5 seconds so it doesn't take forever, min 1.5s
+      const dynamicDuration = Math.min(7, Math.max(4, distance / 4000))
+
+      // @ts-ignore
+      window.lenis.scrollTo(target, {
+        offset: 0,
+        duration: dynamicDuration,
+        easing: easeInOutCubic
+      })
+    } else {
+      if (typeof target === 'number') {
+        window.scrollTo({ top: target, behavior: 'smooth' })
+      } else {
+        document.querySelector(target)?.scrollIntoView({ behavior: 'smooth' })
+      }
+    }
+  }
 
   return (
     <motion.nav
@@ -25,17 +58,11 @@ export const Navbar = () => {
         }`}
     >
       {/* Logo */}
-      <div 
+      <div
         className="flex items-center gap-2.5 cursor-pointer hover:opacity-80 transition-opacity"
         onClick={(e) => {
-          e.preventDefault();
-          // @ts-ignore
-          if (window.lenis) {
-            // @ts-ignore
-            window.lenis.scrollTo(0, { immediate: true }); // Instant jump is best UX for massive distances
-          } else {
-            window.scrollTo({ top: 0 });
-          }
+          e.preventDefault()
+          handleScrollTo(0)
         }}
       >
         <div className="w-7 h-7 rounded-full bg-[#a3e635] flex items-center justify-center">
@@ -53,18 +80,8 @@ export const Navbar = () => {
             key={link.name}
             href={link.href}
             onClick={(e) => {
-              e.preventDefault();
-              // @ts-ignore
-              if (window.lenis) {
-                // @ts-ignore
-                window.lenis.scrollTo(link.href, { 
-                  offset: 0,
-                  duration: 1.5,
-                  easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t))
-                });
-              } else {
-                document.querySelector(link.href)?.scrollIntoView({ behavior: 'smooth' });
-              }
+              e.preventDefault()
+              handleScrollTo(link.href)
             }}
             className="text-[11.5px] font-semibold tracking-[0.18em] text-white/50 uppercase hover:text-white transition-colors duration-300 flex items-center gap-1"
           >
@@ -73,8 +90,6 @@ export const Navbar = () => {
           </a>
         ))}
       </div>
-
-    
     </motion.nav>
   )
 }

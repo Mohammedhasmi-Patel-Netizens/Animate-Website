@@ -35,25 +35,34 @@ export const CaseStudies = () => {
   const cardsRef = useRef<HTMLDivElement>(null)
 
   useGSAP(() => {
-    // --- Cinematic Pinned Scroll Scrubbing ---
+    // --- Cinematic Scroll Scrubbing ---
+    
+    // 1. Separate timeline for animations
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: containerRef.current,
-        start: 'top top',
-        end: '+=200%', // Pin for 2 viewport heights
-        pin: true,
-        scrub: 1.5, // Buttery smooth scrubbing
+        start: 'top 70%', // Start animating before pinning
+        end: '+=250%', 
+        scrub: 1.5,
       }
+    })
+
+    // 2. Separate trigger for pinning
+    ScrollTrigger.create({
+      trigger: containerRef.current,
+      start: 'top top',
+      end: '+=200%',
+      pin: true,
     })
 
     const headerElements = headerRef.current?.children ? Array.from(headerRef.current.children) : []
     const cards = cardsRef.current?.children ? Array.from(cardsRef.current.children) : []
 
-    // 1. Initial States
+    // Initial States
     gsap.set(headerElements, { opacity: 0, y: 80, scale: 0.95, filter: 'blur(10px)' })
-    gsap.set(cards, { opacity: 0, y: window.innerHeight, z: -600, rotateX: 25, rotateY: 'random(-10, 10)', scale: 0.85 })
+    gsap.set(cards, { opacity: 0, y: window.innerHeight * 0.8, z: -600, rotateX: 25, rotateY: 'random(-10, 10)', scale: 0.85 })
 
-    // 2. Phase 1: Header reveals
+    // Phase 1: Header reveals
     tl.to(headerElements, {
       opacity: 1, 
       y: 0, 
@@ -64,7 +73,7 @@ export const CaseStudies = () => {
       ease: 'power3.out',
     })
 
-    // 3. Phase 2: Cards swoop in 3D stagger
+    // Phase 2: Cards swoop in 3D stagger
     tl.to(cards, {
       opacity: 1,
       y: 0,
@@ -75,9 +84,9 @@ export const CaseStudies = () => {
       duration: 2,
       stagger: 0.25,
       ease: 'power4.out',
-    }, '-=0.5') // overlap with header
+    }, '-=0.5')
 
-    // 4. Inner image parallax (the images move slightly inside their containers as you scrub)
+    // Inner image parallax
     cards.forEach((card) => {
       const img = card.querySelector('img')
       if (img) {
@@ -86,19 +95,24 @@ export const CaseStudies = () => {
           {
             y: 30,
             scale: 1.05,
-            duration: 4, // runs alongside the whole timeline
+            duration: 4, // runs alongside timeline
             ease: 'none',
           }, 0
         )
       }
     })
 
-    // 5. Phase 3: Final gentle drift to finish the pin
+    // Phase 3: Final gentle drift
     tl.to([...headerElements, ...cards], {
       y: -50,
       duration: 1.5,
       ease: 'none',
     })
+
+    // Force a refresh
+    setTimeout(() => {
+      ScrollTrigger.refresh()
+    }, 100)
 
   }, { scope: containerRef })
 
