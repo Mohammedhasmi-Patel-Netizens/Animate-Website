@@ -18,14 +18,16 @@ import Lenis from 'lenis'
 function App() {
   useEffect(() => {
     const lenis = new Lenis({
-      duration: 1.25,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      lerp: 0.05, // Much smoother, heavier feeling (replaces duration/easing for a physics-based glide)
+      wheelMultiplier: 0.7, // Slows down the mouse wheel speed
+      smoothWheel: true,
       orientation: 'vertical',
       gestureOrientation: 'vertical',
-      smoothWheel: true,
-      wheelMultiplier: 1,
-      touchMultiplier: 2,
+      touchMultiplier: 1.5,
     })
+
+    // @ts-ignore
+    window.lenis = lenis
 
     function raf(time: number) {
       lenis.raf(time)
@@ -45,19 +47,23 @@ function App() {
       <Hero />
       <StorySection />
       <ForestBanner />
-      <ProductGrid />
-      <DiagramSection />
+      <div id="platform-capabilities"><ProductGrid /></div>
+      <div id="technology"><DiagramSection /></div>
       
       {/* ── WHITE / LIGHT SECTIONS ─────────────────────────────────── */}
       <MarqueeDivider />
-      <SolutionsSection />
-      <TrustProblem />
-      <RedefiningSection />
-      <CaseStudies />
-      <NewsInsights />
+      <div id="our-solutions"><SolutionsSection /></div>
+      <div id="company">
+        <TrustProblem />
+        <RedefiningSection />
+      </div>
+      <div id="resources">
+        <CaseStudies />
+        <NewsInsights />
+      </div>
       
       {/* ── FOOTER ─────────────────────────────────────────────────── */}
-      <Footer />
+      <div id="footer"><Footer /></div>
     </div>
   )
 }

@@ -14,9 +14,7 @@ export const ForestBanner = () => {
   
   const labelRef = useRef<HTMLDivElement>(null)
   const textRef = useRef<HTMLDivElement>(null)
-  const marker1Ref = useRef<HTMLDivElement>(null)
   const marker2Ref = useRef<HTMLDivElement>(null)
-  const marker3Ref = useRef<HTMLDivElement>(null)
 
   useGSAP(() => {
     // Master timeline scrubbed by scroll position
@@ -36,9 +34,7 @@ export const ForestBanner = () => {
     gsap.set([
       labelRef.current, 
       textRef.current, 
-      marker1Ref.current, 
-      marker2Ref.current, 
-      marker3Ref.current
+      marker2Ref.current
     ], { 
       opacity: 0, 
       y: 40 
@@ -53,9 +49,7 @@ export const ForestBanner = () => {
     // 2. Sequential Text & Marker Reveal
     tl.to(labelRef.current, { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out' }, 0.3)
       .to(textRef.current, { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out' }, 0.5)
-      .to(marker1Ref.current, { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out' }, 0.7)
       .to(marker2Ref.current, { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out' }, 0.9)
-      .to(marker3Ref.current, { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out' }, 1.1)
 
     // 3. Background Crossfade (happens concurrently with the text/marker reveal)
     tl.to(bg2Ref.current, { opacity: 1, duration: 1.5, ease: 'none' }, 0.6)
@@ -111,8 +105,8 @@ export const ForestBanner = () => {
           </div>
 
           {/* Main Centered Text */}
-          <div ref={textRef} className="mx-auto max-w-[800px] text-center mt-[-5%]">
-            <h2 className="text-[clamp(1.5rem,3.5vw,2.8rem)] font-medium leading-[1.25] tracking-tight text-white drop-shadow-md">
+          <div ref={textRef} className="mx-auto max-w-[800px] text-center mt-[-5%] flex flex-col items-center">
+            <h2 className="text-[clamp(1.5rem,3.5vw,2.8rem)] font-medium leading-[1.25] tracking-tight text-white drop-shadow-md mb-8">
               Our Ecosystem-Level Accounting<br className="hidden md:block" />
               Solutions translate complex<br className="hidden md:block" />
               scientific data into verifiable,<br className="hidden md:block" />
@@ -120,49 +114,18 @@ export const ForestBanner = () => {
               you can drive measurable results,<br className="hidden md:block" />
               not just reports.
             </h2>
-          </div>
-
-          {/* HUD Markers Overlay */}
-          <div className="absolute inset-0 pointer-events-none">
-            {/* Marker 1 (Bottom Left) */}
-            <div ref={marker1Ref} className="absolute bottom-[25%] left-[15%] flex items-center gap-3">
+            
+            {/* Single Centered Marker */}
+            <div ref={marker2Ref} className="flex items-center gap-3 mt-4">
               <div className="w-7 h-7 rounded-full bg-[#a3e635]/80 backdrop-blur-md flex items-center justify-center relative shadow-[0_0_20px_rgba(163,230,53,0.5)]">
                 <span className="w-3 h-3 border border-[#0a0a0a]/40 rounded-full flex items-center justify-center">
                   <span className="w-1 h-1 bg-[#0a0a0a] rounded-full" />
                 </span>
               </div>
-              <p className="text-[7px] font-mono tracking-widest text-white/90 uppercase leading-tight font-bold drop-shadow-sm text-left">
-                All Emissions<br />
-                Measured Using High<br />
-                Grade Tech
-              </p>
-            </div>
-
-            {/* Marker 2 (Center Bottom) */}
-            <div ref={marker2Ref} className="absolute bottom-[35%] left-[55%] flex items-center gap-3">
-              <div className="w-7 h-7 rounded-full bg-[#a3e635]/80 backdrop-blur-md flex items-center justify-center relative shadow-[0_0_20px_rgba(163,230,53,0.5)]">
-                <span className="w-3 h-3 border border-[#0a0a0a]/40 rounded-full flex items-center justify-center">
-                  <span className="w-1 h-1 bg-[#0a0a0a] rounded-full" />
-                </span>
-              </div>
-              <p className="text-[7px] font-mono tracking-widest text-white/90 uppercase leading-tight font-bold drop-shadow-sm text-left">
+              <p className="text-[7.5px] font-mono tracking-widest text-white/90 uppercase leading-tight font-bold drop-shadow-sm text-left">
                 All Measurement<br />
                 Data is Validated<br />
                 By Protocol
-              </p>
-            </div>
-
-            {/* Marker 3 (Right Center) */}
-            <div ref={marker3Ref} className="absolute bottom-[20%] right-[15%] flex items-center gap-3">
-              <div className="w-7 h-7 rounded-full bg-[#a3e635]/80 backdrop-blur-md flex items-center justify-center relative shadow-[0_0_20px_rgba(163,230,53,0.5)]">
-                <span className="w-3 h-3 border border-[#0a0a0a]/40 rounded-full flex items-center justify-center">
-                  <span className="w-1 h-1 bg-[#0a0a0a] rounded-full" />
-                </span>
-              </div>
-              <p className="text-[7px] font-mono tracking-widest text-white/90 uppercase leading-tight font-bold drop-shadow-sm text-left">
-                Fully Transparent<br />
-                Blockchain Ledger<br />
-                Integrated
               </p>
             </div>
           </div>

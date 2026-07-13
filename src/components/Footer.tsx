@@ -1,18 +1,15 @@
-import { motion, useScroll, useTransform } from 'framer-motion'
 import { useRef } from 'react'
 
 const footerLinks = {
-  Solutions:  ['Carbon MRV', 'Biodiversity', 'Water Stewardship', 'Reporting Suite'],
+  Solutions: ['Carbon MRV', 'Biodiversity', 'Water Stewardship', 'Reporting Suite'],
   Technology: ['Sensor Network', 'Blockchain Layer', 'AI Processing', 'API Access'],
-  Company:    ['About Us', 'Science Team', 'Careers', 'Press'],
-  Resources:  ['Documentation', 'Case Studies', 'Whitepapers', 'Blog'],
+  Company: ['About Us', 'Science Team', 'Careers', 'Press'],
+  Resources: ['Documentation', 'Case Studies', 'Whitepapers', 'Blog'],
 }
 
 export const Footer = () => {
   const ref = useRef<HTMLDivElement>(null)
-  const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end end'] })
-  const logoScale = useTransform(scrollYProgress, [0, 1], [0.5, 1])
-  const logoOpacity = useTransform(scrollYProgress, [0, 0.5], [0, 1])
+
 
   return (
     <footer ref={ref} className="relative overflow-hidden">
@@ -83,52 +80,7 @@ export const Footer = () => {
       </div>
 
       {/* ── GIANT FOREST FOOTER — Frame 19 ──────────────────────────── */}
-      <div className="relative h-[90vh] overflow-hidden flex items-center justify-center">
-        {/* Forest background */}
-        <div className="absolute inset-0 z-0">
-          <img
-            src="/forest.png"
-            alt="Forest backdrop"
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#0a3d0a]/80 via-[#0a3d0a]/40 to-[#0a3d0a]/70" />
-        </div>
 
-        {/* CTA Button floating above */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: false, amount: 0.3 }}
-          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-          className="absolute top-16 left-1/2 -translate-x-1/2 z-20"
-        >
-          <button className="px-8 py-3 rounded-full bg-[#a3e635] text-[#0a0a0a] text-[11px] font-bold tracking-[0.2em] uppercase hover:bg-[#bfff00] transition-all duration-300 flex items-center gap-2 shadow-lg">
-            Let's Talk
-            <svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M5 12h14M12 5l7 7-7 7" />
-            </svg>
-          </button>
-        </motion.div>
-
-        {/* Giant "alethia" wordmark */}
-        <motion.div
-          style={{ scale: logoScale, opacity: logoOpacity }}
-          className="relative z-10 text-center"
-        >
-          <span
-            className="block font-black lowercase leading-none select-none"
-            style={{
-              fontSize: 'clamp(6rem, 22vw, 22rem)',
-              letterSpacing: '-0.05em',
-              color: '#a3e635',
-              textShadow: '0 0 120px rgba(163, 230, 53, 0.4), 0 0 60px rgba(163, 230, 53, 0.2)',
-              WebkitTextStroke: '2px rgba(163, 230, 53, 0.8)',
-            }}
-          >
-            alethia
-          </span>
-        </motion.div>
-      </div>
     </footer>
   )
 }
