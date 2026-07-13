@@ -36,18 +36,27 @@ export const CaseStudies = () => {
 
   useGSAP(() => {
     // --- Cinematic Scroll Scrubbing ---
-    
-    // 1. Separate timeline for animations
-    const tl = gsap.timeline({
+    // 1. Entrance timeline (ends exactly at top top to ensure full load on anchor jump)
+    const entranceTl = gsap.timeline({
       scrollTrigger: {
         trigger: containerRef.current,
-        start: 'top 70%', // Start animating before pinning
-        end: '+=250%', 
+        start: 'top 85%', 
+        end: 'top top', 
+        scrub: 1,
+      }
+    })
+
+    // 2. Pin scroll timeline (runs while pinned)
+    const pinTl = gsap.timeline({
+      scrollTrigger: {
+        trigger: containerRef.current,
+        start: 'top top',
+        end: '+=200%',
         scrub: 1.5,
       }
     })
 
-    // 2. Separate trigger for pinning
+    // 3. Separate trigger for pinning
     ScrollTrigger.create({
       trigger: containerRef.current,
       start: 'top top',
@@ -63,7 +72,7 @@ export const CaseStudies = () => {
     gsap.set(cards, { opacity: 0, y: window.innerHeight * 0.8, z: -600, rotateX: 25, rotateY: 'random(-10, 10)', scale: 0.85 })
 
     // Phase 1: Header reveals
-    tl.to(headerElements, {
+    entranceTl.to(headerElements, {
       opacity: 1, 
       y: 0, 
       scale: 1, 
@@ -74,7 +83,7 @@ export const CaseStudies = () => {
     })
 
     // Phase 2: Cards swoop in 3D stagger
-    tl.to(cards, {
+    entranceTl.to(cards, {
       opacity: 1,
       y: 0,
       z: 0,
@@ -86,24 +95,24 @@ export const CaseStudies = () => {
       ease: 'power4.out',
     }, '-=0.5')
 
-    // Inner image parallax
+    // Inner image parallax (runs while pinned)
     cards.forEach((card) => {
       const img = card.querySelector('img')
       if (img) {
-        tl.fromTo(img, 
+        pinTl.fromTo(img, 
           { y: -30, scale: 1.1 },
           {
             y: 30,
             scale: 1.05,
-            duration: 4, // runs alongside timeline
+            duration: 4, 
             ease: 'none',
           }, 0
         )
       }
     })
 
-    // Phase 3: Final gentle drift
-    tl.to([...headerElements, ...cards], {
+    // Phase 3: Final gentle drift (runs while pinned)
+    pinTl.to([...headerElements, ...cards], {
       y: -50,
       duration: 1.5,
       ease: 'none',

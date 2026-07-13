@@ -9,7 +9,6 @@ const navLinks = [
 ]
 
 // Cinematic slow easing curve
-const easeInOutCubic = (t: number) => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2
 
 export const Navbar = () => {
   const [scrolled, setScrolled] = useState(false)
@@ -20,29 +19,14 @@ export const Navbar = () => {
   const handleScrollTo = (target: string | number) => {
     // @ts-ignore
     if (window.lenis) {
-      let distance = 0
-
-      if (typeof target === 'number') {
-        distance = window.scrollY // If going to top, distance is current scroll pos
-      } else {
-        const el = document.querySelector(target)
-        if (el) distance = Math.abs(el.getBoundingClientRect().top)
-      }
-
-      // Balanced cinematic scrolling: max 3.5 seconds so it doesn't take forever, min 1.5s
-      const dynamicDuration = Math.min(7, Math.max(4, distance / 4000))
-
       // @ts-ignore
-      window.lenis.scrollTo(target, {
-        offset: 0,
-        duration: dynamicDuration,
-        easing: easeInOutCubic
-      })
+      window.lenis.scrollTo(target, { immediate: true })
     } else {
       if (typeof target === 'number') {
-        window.scrollTo({ top: target, behavior: 'smooth' })
+        window.scrollTo({ top: target })
       } else {
-        document.querySelector(target)?.scrollIntoView({ behavior: 'smooth' })
+        const el = document.querySelector(target)
+        if (el) el.scrollIntoView()
       }
     }
   }

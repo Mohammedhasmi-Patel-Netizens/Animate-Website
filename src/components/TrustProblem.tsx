@@ -13,18 +13,27 @@ export const TrustProblem = () => {
 
   useGSAP(() => {
     // --- Cinematic Scroll Scrubbing ---
-    
-    // 1. Separate timeline for animations
-    const tl = gsap.timeline({
+    // 1. Entrance timeline (ends exactly at top top to ensure full load on anchor jump)
+    const entranceTl = gsap.timeline({
       scrollTrigger: {
         trigger: containerRef.current,
-        start: 'top 70%', // Start animating before pinning
-        end: '+=250%', 
+        start: 'top 85%', 
+        end: 'top top', 
+        scrub: 1,
+      }
+    })
+
+    // 2. Pin scroll timeline (runs while pinned)
+    const pinTl = gsap.timeline({
+      scrollTrigger: {
+        trigger: containerRef.current,
+        start: 'top top',
+        end: '+=250%',
         scrub: 1.5,
       }
     })
 
-    // 2. Separate trigger for pinning
+    // 3. Separate trigger for pinning
     ScrollTrigger.create({
       trigger: containerRef.current,
       start: 'top top',
@@ -42,7 +51,7 @@ export const TrustProblem = () => {
     gsap.set(bottomCards, { opacity: 0, y: 400, z: -800, rotateX: 60, rotateY: 'random(-20, 20)', scale: 0.5 })
 
     // Phase 1: Text reveal
-    tl.to(textChildren, {
+    entranceTl.to(textChildren, {
       opacity: 1, 
       y: 0, 
       scale: 1, 
@@ -53,7 +62,7 @@ export const TrustProblem = () => {
     })
 
     // Phase 2: Top and Bottom Cards swoop in
-    tl.to(topCards, {
+    entranceTl.to(topCards, {
       opacity: 1,
       y: 0,
       z: 0,
@@ -65,7 +74,7 @@ export const TrustProblem = () => {
       ease: 'power4.out',
     }, '-=0.5')
 
-    tl.to(bottomCards, {
+    entranceTl.to(bottomCards, {
       opacity: 1,
       y: 0,
       z: 0,
@@ -77,8 +86,8 @@ export const TrustProblem = () => {
       ease: 'power4.out',
     }, '<')
 
-    // Phase 3: Majestic slow drift
-    tl.to([...topCards, ...bottomCards], {
+    // Phase 3: Majestic slow drift (runs while pinned)
+    pinTl.to([...topCards, ...bottomCards], {
       y: (i) => i % 2 === 0 ? -40 : 40,
       z: 50,
       rotation: 'random(-2, 2)',

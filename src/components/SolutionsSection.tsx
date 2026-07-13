@@ -27,17 +27,27 @@ export const SolutionsSection = () => {
     window.addEventListener('mousemove', handleMouseMove)
 
     // --- Cinematic Scroll Scrubbing ---
-    // 1. Separate timeline for animations (starts earlier so content is visible on anchor jump)
-    const tl = gsap.timeline({
+    // 1. Entrance timeline (ends exactly at top top to ensure full load on anchor jump)
+    const entranceTl = gsap.timeline({
       scrollTrigger: {
         trigger: containerRef.current,
-        start: 'top 70%', // Start animating before it pins
-        end: '+=250%', 
+        start: 'top 85%', 
+        end: 'top top', 
+        scrub: 1,
+      }
+    })
+
+    // 2. Pin scroll timeline (runs while pinned)
+    const pinTl = gsap.timeline({
+      scrollTrigger: {
+        trigger: containerRef.current,
+        start: 'top top',
+        end: '+=200%',
         scrub: 1.5,
       }
     })
 
-    // 2. Separate trigger strictly for pinning
+    // 3. Separate trigger strictly for pinning
     ScrollTrigger.create({
       trigger: containerRef.current,
       start: 'top top',
@@ -53,7 +63,7 @@ export const SolutionsSection = () => {
     gsap.set(card2Ref.current, { opacity: 0, y: window.innerHeight * 0.8, z: -500, rotateX: 45, rotateY: 15, scale: 0.8 })
 
     // Animate Header In
-    tl.to(headerElements, {
+    entranceTl.to(headerElements, {
       opacity: 1,
       y: 0,
       scale: 1,
@@ -64,7 +74,7 @@ export const SolutionsSection = () => {
     })
 
     // Animate Card 1 (Left) In
-    tl.to(card1Ref.current, {
+    entranceTl.to(card1Ref.current, {
       opacity: 1,
       y: 0,
       z: 0,
@@ -76,7 +86,7 @@ export const SolutionsSection = () => {
     }, '-=0.5')
 
     // Animate Card 2 (Right) In
-    tl.to(card2Ref.current, {
+    entranceTl.to(card2Ref.current, {
       opacity: 1,
       y: 0,
       z: 0,
@@ -87,8 +97,8 @@ export const SolutionsSection = () => {
       ease: 'power4.out',
     }, '-=1.0')
 
-    // Final subtle parallax push on scrub end
-    tl.to([card1Ref.current, card2Ref.current], {
+    // Final subtle parallax push on scrub end (runs while pinned)
+    pinTl.to([card1Ref.current, card2Ref.current], {
       y: -50,
       duration: 1,
       ease: 'none'
@@ -121,19 +131,19 @@ export const SolutionsSection = () => {
       <div className="absolute top-0 -left-32 w-[600px] h-[600px] bg-[#a3e635]/15 rounded-full blur-[150px] pointer-events-none floating-orb-light" />
       <div className="absolute bottom-0 -right-32 w-[500px] h-[500px] bg-black/5 rounded-full blur-[120px] pointer-events-none floating-orb-light" />
 
-      <div className="max-w-[1400px] w-full mx-auto px-8 md:px-16 parallax-layer relative z-10 flex flex-col items-center justify-center">
+      <div className="max-w-[1400px] w-full mx-auto px-8 md:px-16 parallax-layer relative z-10 flex flex-col items-center justify-center pt-20">
 
         {/* Header Content */}
-        <div ref={headerRef} className="relative z-10 w-full mb-16 text-center flex flex-col items-center">
-          <div className="mb-8">
+        <div ref={headerRef} className="relative z-10 w-full mb-10 text-center flex flex-col items-center">
+          <div className="mb-4">
             <span className="inline-block px-5 py-2 rounded-full border border-black/5 bg-black/5 backdrop-blur-sm text-[11px] font-mono tracking-[0.28em] text-[#0a0a0a]/70 uppercase shadow-sm">
               Our Solutions
             </span>
           </div>
-          <h2 className="text-[clamp(2.5rem,5vw,4.5rem)] font-bold tracking-[-0.03em] leading-[1.05] text-[#0a0a0a] max-w-[800px] mb-6">
+          <h2 className="text-[clamp(2rem,4vw,3.2rem)] font-bold tracking-[-0.03em] leading-[1.05] text-[#0a0a0a] max-w-[800px] mb-4">
             Validating What the Ecosystem Does <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#74a822] to-[#a3e635]">Naturally.</span>
           </h2>
-          <p className="text-[16px] leading-[1.8] text-[#0a0a0a]/60 max-w-[540px] font-medium mx-auto">
+          <p className="text-[15px] leading-[1.7] text-[#0a0a0a]/60 max-w-[540px] font-medium mx-auto">
             We deploy science-grade monitoring infrastructure to measure, report, 
             and verify the carbon sequestration of natural ecosystems at unprecedented accuracy.
           </p>
@@ -142,7 +152,7 @@ export const SolutionsSection = () => {
         {/* Bento grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 perspective-[1200px] w-full">
           {/* Left: Dark photo card */}
-          <div ref={card1Ref} className="relative rounded-[2rem] overflow-hidden h-[450px] group cursor-pointer will-change-transform transform-gpu shadow-[0_20px_50px_rgba(0,0,0,0.1)] hover:shadow-[0_30px_60px_rgba(0,0,0,0.2)] transition-shadow duration-700">
+          <div ref={card1Ref} className="relative rounded-[2rem] overflow-hidden h-[380px] group cursor-pointer will-change-transform transform-gpu shadow-[0_20px_50px_rgba(0,0,0,0.1)] hover:shadow-[0_30px_60px_rgba(0,0,0,0.2)] transition-shadow duration-700">
             <img
               src="/leaves.png"
               alt="Carbon Markets"
@@ -163,7 +173,7 @@ export const SolutionsSection = () => {
           </div>
 
           {/* Right: Lime green card */}
-          <div ref={card2Ref} className="relative bg-gradient-to-br from-[#a3e635] to-[#86c522] rounded-[2rem] p-10 h-[450px] flex flex-col justify-between overflow-hidden group cursor-pointer will-change-transform transform-gpu shadow-[0_20px_50px_rgba(163,230,53,0.3)] hover:shadow-[0_30px_60px_rgba(163,230,53,0.4)] transition-shadow duration-700 border border-white/40">
+          <div ref={card2Ref} className="relative bg-gradient-to-br from-[#a3e635] to-[#86c522] rounded-[2rem] p-10 h-[380px] flex flex-col justify-between overflow-hidden group cursor-pointer will-change-transform transform-gpu shadow-[0_20px_50px_rgba(163,230,53,0.3)] hover:shadow-[0_30px_60px_rgba(163,230,53,0.4)] transition-shadow duration-700 border border-white/40">
             {/* Decorative circles */}
             <div className="absolute -right-20 -bottom-20 w-80 h-80 rounded-full bg-white/20 blur-2xl group-hover:scale-125 transition-transform duration-700 ease-out" />
             <div className="absolute -left-10 -top-10 w-48 h-48 rounded-full bg-black/5 blur-xl group-hover:scale-110 transition-transform duration-700 ease-out" />
