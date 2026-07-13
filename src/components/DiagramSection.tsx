@@ -1,4 +1,4 @@
-import { useRef, useEffect } from 'react'
+import { useRef } from 'react'
 import { motion } from 'framer-motion'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
@@ -42,8 +42,8 @@ const BlockchainSVG = () => (
   <svg viewBox="0 0 260 220" fill="none" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
     <motion.line x1="20" y1="200" x2="240" y2="200" variants={drawPath(0)} />
     <motion.line x1="130" y1="200" x2="130" y2="120" variants={drawPath(0.3)} />
-    <motion.line x1="130" y1="120" x2="170" y2="80"  variants={drawPath(0.5)} />
-    <motion.line x1="170" y1="80"  x2="210" y2="100" variants={drawPath(0.7)} />
+    <motion.line x1="130" y1="120" x2="170" y2="80" variants={drawPath(0.5)} />
+    <motion.line x1="170" y1="80" x2="210" y2="100" variants={drawPath(0.7)} />
     <motion.line x1="200" y1="100" x2="220" y2="120" variants={drawPath(0.9)} />
     <motion.line x1="220" y1="100" x2="200" y2="120" variants={drawPath(0.9)} />
     {[60, 100, 140, 180].map((x, i) => (
@@ -53,7 +53,7 @@ const BlockchainSVG = () => (
       <motion.circle key={x} cx={x} cy="186" r="3" fill="white" variants={drawPath(0.3 + i * 0.1)} />
     ))}
     <motion.path d="M 80 175 Q 90 140 130 120" variants={drawPath(1)} />
-    <motion.path d="M 140 175 Q 155 150 170 80"  variants={drawPath(1.2)} />
+    <motion.path d="M 140 175 Q 155 150 170 80" variants={drawPath(1.2)} />
   </svg>
 )
 
@@ -63,7 +63,7 @@ const SatelliteSVG = () => (
     <motion.path d="M 30 160 Q 100 30 170 160" variants={drawPath(0)} />
     <motion.line x1="100" y1="30" x2="100" y2="100" variants={drawPath(0.5)} />
     <motion.line x1="100" y1="160" x2="100" y2="185" variants={drawPath(0.7)} />
-    <motion.line x1="70"  y1="185" x2="130" y2="185" variants={drawPath(0.8)} />
+    <motion.line x1="70" y1="185" x2="130" y2="185" variants={drawPath(0.8)} />
     <motion.path d="M 100 100 Q 130 70 160 100" strokeDasharray="4 4" variants={drawPath(1)} />
     <motion.path d="M 100 100 Q 120 80 140 100" strokeDasharray="4 4" variants={drawPath(1.1)} />
     <motion.circle cx="100" cy="100" r="6" variants={drawPath(1.2)} />
@@ -96,19 +96,19 @@ export const DiagramSection = () => {
     })
 
     // --- Mouse Parallax ---
-    const xTo = gsap.quickTo(q('.parallax-layer'), "x", {duration: 0.8, ease: "power3.out"})
-    const yTo = gsap.quickTo(q('.parallax-layer'), "y", {duration: 0.8, ease: "power3.out"})
-    const cardXTo = gsap.quickTo(q('.diagram-container'), "rotateY", {duration: 0.5, ease: "power2.out"})
-    const cardYTo = gsap.quickTo(q('.diagram-container'), "rotateX", {duration: 0.5, ease: "power2.out"})
+    const xTo = gsap.quickTo(q('.parallax-layer'), "x", { duration: 0.8, ease: "power3.out" })
+    const yTo = gsap.quickTo(q('.parallax-layer'), "y", { duration: 0.8, ease: "power3.out" })
+    const cardXTo = gsap.quickTo(q('.diagram-container'), "rotateY", { duration: 0.5, ease: "power2.out" })
+    const cardYTo = gsap.quickTo(q('.diagram-container'), "rotateX", { duration: 0.5, ease: "power2.out" })
 
     const handleMouseMove = (e: MouseEvent) => {
       const { clientX, clientY } = e
       const x = (clientX / window.innerWidth - 0.5) * 30
       const y = (clientY / window.innerHeight - 0.5) * 30
-      
+
       xTo(x)
       yTo(y)
-      
+
       // 3D tilt based on mouse position for the diagrams
       cardXTo((clientX / window.innerWidth - 0.5) * 20)
       cardYTo(-(clientY / window.innerHeight - 0.5) * 20)
@@ -169,7 +169,7 @@ export const DiagramSection = () => {
 
   return (
     <section ref={containerRef} className="relative z-10 bg-[#0a0a0a] h-screen w-full flex items-center overflow-hidden border-t border-white/[0.06] perspective-[1500px]">
-      
+
       {/* Background ambient glows matching ProductGrid */}
       <div className="absolute top-1/3 -right-32 w-[600px] h-[600px] bg-[#a3e635]/5 rounded-full blur-[150px] pointer-events-none floating-orb" />
       <div className="absolute bottom-1/4 -left-32 w-[500px] h-[500px] bg-[#a3e635]/5 rounded-full blur-[120px] pointer-events-none floating-orb" />
@@ -211,9 +211,9 @@ export const DiagramSection = () => {
           {/* ── RIGHT: THREE SVG DIAGRAMS ───────────────────────────── */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 perspective-[1200px] diagram-container transform-gpu will-change-transform">
             {[
-              { Svg: TowerSVG,      label: 'Flux Tower' },
+              { Svg: TowerSVG, label: 'Flux Tower' },
               { Svg: BlockchainSVG, label: 'Blockchain MRV' },
-              { Svg: SatelliteSVG,  label: 'Satellite Link' },
+              { Svg: SatelliteSVG, label: 'Satellite Link' },
             ].map(({ Svg, label }, i) => (
               <div
                 key={label}
@@ -237,7 +237,7 @@ export const DiagramSection = () => {
                     <Svg />
                   </g>
                 </motion.svg>
-                
+
                 <span className="text-[10px] font-mono tracking-[0.2em] text-white/40 uppercase text-center group-hover:text-[#a3e635] transition-colors duration-500 relative z-10">
                   {label}
                 </span>

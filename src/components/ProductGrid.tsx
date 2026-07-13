@@ -1,4 +1,4 @@
-import { useRef, useEffect } from 'react'
+import { useRef } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useGSAP } from '@gsap/react'
@@ -36,7 +36,7 @@ export const ProductGrid = () => {
       y: 20, opacity: 0, duration: 1, ease: 'power3.out',
       scrollTrigger: { trigger: containerRef.current, start: 'top 80%' }
     })
-    
+
     gsap.from(q('.feature-item'), {
       y: 40, opacity: 0, duration: 0.8, stagger: 0.15, ease: 'power3.out',
       scrollTrigger: { trigger: containerRef.current, start: 'top 70%' }
@@ -112,9 +112,9 @@ export const ProductGrid = () => {
     })
 
     // --- Mouse Parallax ---
-    const xTo = gsap.quickTo(q('.parallax-layer'), "x", {duration: 0.8, ease: "power3.out"})
-    const yTo = gsap.quickTo(q('.parallax-layer'), "y", {duration: 0.8, ease: "power3.out"})
-    
+    const xTo = gsap.quickTo(q('.parallax-layer'), "x", { duration: 0.8, ease: "power3.out" })
+    const yTo = gsap.quickTo(q('.parallax-layer'), "y", { duration: 0.8, ease: "power3.out" })
+
     const handleMouseMove = (e: MouseEvent) => {
       const { clientX, clientY } = e
       const x = (clientX / window.innerWidth - 0.5) * 40
@@ -122,7 +122,7 @@ export const ProductGrid = () => {
       xTo(x)
       yTo(y)
     }
-    
+
     window.addEventListener('mousemove', handleMouseMove)
     return () => window.removeEventListener('mousemove', handleMouseMove)
 
@@ -130,11 +130,11 @@ export const ProductGrid = () => {
 
   return (
     <section ref={containerRef} className="relative z-10 bg-[#0a0a0a] h-screen w-full flex items-center overflow-hidden shadow-[0_-20px_50px_rgba(10,10,10,1)] perspective-[1200px]">
-      
+
       {/* Background ambient glows */}
       <div className="absolute top-1/4 -left-32 w-[500px] h-[500px] bg-[#a3e635]/5 rounded-full blur-[120px] pointer-events-none floating-orb" />
       <div className="absolute bottom-1/4 -right-32 w-[600px] h-[600px] bg-[#a3e635]/5 rounded-full blur-[150px] pointer-events-none floating-orb" />
-      
+
       <div className="w-full max-w-[1400px] mx-auto px-8 md:px-16 flex flex-col justify-center h-full parallax-layer">
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-24 items-center">
@@ -200,7 +200,7 @@ export const ProductGrid = () => {
             <div className="img-2 absolute inset-0 overflow-hidden rounded-[2rem] will-change-transform transform-gpu shadow-[0_30px_60px_-15px_rgba(0,0,0,0.8)] border border-white/5 bg-[#0f1115]">
               {/* Grid background */}
               <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]"></div>
-              
+
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[80%] h-48 border border-[#a3e635]/30 rounded-xl bg-[#a3e635]/5 backdrop-blur-sm p-6 flex flex-col justify-between">
                 <div className="flex justify-between items-center border-b border-[#a3e635]/20 pb-4">
                   <span className="text-[#a3e635] font-mono text-sm">NODE_084_ACTIVE</span>
@@ -213,7 +213,7 @@ export const ProductGrid = () => {
                   </div>
                   {/* Mini chart visual */}
                   <div className="flex items-end gap-1 h-12">
-                    {[4,7,5,8,6,9,7].map((h, i) => (
+                    {[4, 7, 5, 8, 6, 9, 7].map((h, i) => (
                       <div key={i} className="w-2 bg-[#a3e635]/50 rounded-t-sm" style={{ height: `${h * 10}%` }}></div>
                     ))}
                   </div>
@@ -224,7 +224,7 @@ export const ProductGrid = () => {
             {/* Image 3: Blockchain */}
             <div className="img-3 absolute inset-0 overflow-hidden rounded-[2rem] will-change-transform transform-gpu shadow-[0_30px_60px_-15px_rgba(0,0,0,0.8)] border border-[#a3e635]/20 bg-[#050a05]">
               <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#a3e635]/10 via-transparent to-transparent"></div>
-              
+
               <div className="h-full w-full flex flex-col p-10 font-mono">
                 <div className="text-[#a3e635] text-sm mb-8 opacity-70">LATEST_BLOCK_HASH</div>
                 <div className="space-y-4 text-xs text-white/40 break-all leading-relaxed">
