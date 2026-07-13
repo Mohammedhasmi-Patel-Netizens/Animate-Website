@@ -12,98 +12,79 @@ export const TrustProblem = () => {
   const lowerCardsRef = useRef<HTMLDivElement>(null)
 
   useGSAP(() => {
-    // Top floating bento cards animation
-    const cards = cardsRef.current?.children ? Array.from(cardsRef.current.children) : []
-    
-    // Initial entrance staggered
-    gsap.fromTo(cards,
-      { opacity: 0, y: 150, rotateX: 30, scale: 0.8 },
-      {
-        opacity: 1, y: 0, rotateX: 0, scale: 1,
-        duration: 1.2,
-        stagger: 0.1,
-        ease: 'back.out(1.2)',
-        scrollTrigger: {
-          trigger: containerRef.current,
-          start: 'top 75%',
-        }
+    // --- Cinematic Pinned Scroll Scrubbing ---
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: containerRef.current,
+        start: 'top top',
+        end: '+=250%', // Pin for 2.5 viewport heights
+        pin: true,
+        scrub: 1.5, // Buttery smooth scrubbing
       }
-    )
-
-    // Scroll scrubbed parallax for the top cards
-    cards.forEach((card, i) => {
-      // Create different speeds/directions for each card
-      const speed = (i % 2 === 0 ? 1 : -1) * (i * 15 + 20)
-      
-      gsap.to(card, {
-        y: speed,
-        rotation: (i % 2 === 0 ? 3 : -3),
-        ease: 'none',
-        scrollTrigger: {
-          trigger: containerRef.current,
-          start: 'top bottom',
-          end: 'bottom top',
-          scrub: 1.5,
-        }
-      })
     })
 
-    // Text reveal
+    const topCards = cardsRef.current?.children ? Array.from(cardsRef.current.children) : []
+    const bottomCards = lowerCardsRef.current?.children ? Array.from(lowerCardsRef.current.children) : []
     const textChildren = textRef.current?.children ? Array.from(textRef.current.children) : []
-    gsap.fromTo(textChildren,
-      { opacity: 0, y: 40 },
-      {
-        opacity: 1, y: 0,
-        duration: 1,
-        stagger: 0.2,
-        ease: 'power3.out',
-        scrollTrigger: {
-          trigger: textRef.current,
-          start: 'top 80%',
-        }
-      }
-    )
 
-    // Lower floating bento cards animation
-    const lowerCards = lowerCardsRef.current?.children ? Array.from(lowerCardsRef.current.children) : []
-    
-    gsap.fromTo(lowerCards,
-      { opacity: 0, y: 100, rotateY: 15 },
-      {
-        opacity: 1, y: 0, rotateY: 0,
-        duration: 1,
-        stagger: 0.15,
-        ease: 'power3.out',
-        scrollTrigger: {
-          trigger: lowerCardsRef.current,
-          start: 'top 85%',
-        }
-      }
-    )
+    // 1. Initial States
+    gsap.set(textChildren, { opacity: 0, y: 50, scale: 0.9, filter: 'blur(15px)' })
+    gsap.set(topCards, { opacity: 0, y: -400, z: -800, rotateX: -60, rotateY: 'random(-20, 20)', scale: 0.5 })
+    gsap.set(bottomCards, { opacity: 0, y: 400, z: -800, rotateX: 60, rotateY: 'random(-20, 20)', scale: 0.5 })
 
-    // Parallax for lower cards
-    lowerCards.forEach((card, i) => {
-      const speed = (i === 1 ? -40 : -80)
-      gsap.to(card, {
-        y: speed,
-        ease: 'none',
-        scrollTrigger: {
-          trigger: lowerCardsRef.current,
-          start: 'top bottom',
-          end: 'bottom top',
-          scrub: 1,
-        }
-      })
+    // 2. Phase 1: Text reveal
+    tl.to(textChildren, {
+      opacity: 1, 
+      y: 0, 
+      scale: 1, 
+      filter: 'blur(0px)',
+      duration: 1.5,
+      stagger: 0.2,
+      ease: 'power3.out',
+    })
+
+    // 3. Phase 2: Top and Bottom Cards swoop in from 3D space
+    tl.to(topCards, {
+      opacity: 1,
+      y: 0,
+      z: 0,
+      rotateX: 0,
+      rotateY: 0,
+      scale: 1,
+      duration: 2,
+      stagger: { amount: 0.8, from: "edges" },
+      ease: 'power4.out',
+    }, '-=0.5') // overlap slightly with text
+
+    tl.to(bottomCards, {
+      opacity: 1,
+      y: 0,
+      z: 0,
+      rotateX: 0,
+      rotateY: 0,
+      scale: 1,
+      duration: 2,
+      stagger: { amount: 0.5, from: "center" },
+      ease: 'power4.out',
+    }, '<') // start at exactly the same time as top cards
+
+    // 4. Phase 3: Majestic slow drift
+    tl.to([...topCards, ...bottomCards], {
+      y: (i) => i % 2 === 0 ? -40 : 40, // subtle split drift
+      z: 50, // slight push towards camera
+      rotation: 'random(-2, 2)',
+      duration: 2,
+      ease: 'none',
     })
 
   }, { scope: containerRef })
 
   return (
-    <section ref={containerRef} className="relative z-10 bg-[#f5f5f3] py-32 overflow-hidden perspective-[1200px]">
-      <div className="max-w-[1400px] mx-auto px-8 md:px-16">
+    <section ref={containerRef} className="relative z-10 bg-[#f5f5f3] h-screen w-full flex items-center justify-center overflow-hidden perspective-[1200px]">
+      <div className="max-w-[1400px] w-full mx-auto px-8 md:px-16 flex flex-col items-center justify-center relative">
 
         {/* Floating Bento Cards - Top row */}
-        <div ref={cardsRef} className="relative flex items-center justify-center gap-4 mb-20 min-h-[280px]">
+        <div ref={cardsRef} className="relative flex flex-wrap items-center justify-center gap-4 mb-16 min-h-[280px] w-full">
           {/* Card 1: Equipment photo */}
           <div className="w-[180px] h-[220px] rounded-2xl overflow-hidden shadow-2xl border border-black/5 shrink-0 will-change-transform">
             <img src="/sensor.png" alt="Equipment" className="w-full h-full object-cover" />
@@ -171,23 +152,23 @@ export const TrustProblem = () => {
         </div>
 
         {/* Text content */}
-        <div ref={textRef} className="text-center max-w-3xl mx-auto">
-          <span className="inline-block mb-5 text-[10px] font-mono tracking-[0.28em] text-[#a3e635] uppercase">
+        <div ref={textRef} className="text-center max-w-3xl mx-auto relative z-20">
+          <span className="inline-block mb-4 text-[10px] font-mono tracking-[0.28em] text-[#a3e635] uppercase">
             Alethia Solves
           </span>
 
-          <h2 className="text-[clamp(2rem,4.5vw,3.5rem)] font-bold tracking-[-0.03em] leading-[1.08] text-[#0a0a0a] mb-6">
+          <h2 className="text-[clamp(2.2rem,4.5vw,3.5rem)] font-bold tracking-[-0.03em] leading-[1.08] text-[#0a0a0a] mb-5 drop-shadow-sm">
             The Biggest Problem in Climate<br />Action: Trust
           </h2>
 
-          <p className="text-[15px] leading-[1.8] text-[#0a0a0a]/45 max-w-[560px] mx-auto">
+          <p className="text-[16px] font-medium leading-[1.8] text-[#0a0a0a]/50 max-w-[560px] mx-auto drop-shadow-sm">
             Quantify your impact, prove your progress, and earn the trust of regulators, 
             stakeholders, and the communities you serve.
           </p>
         </div>
 
         {/* Lower floating metric cards */}
-        <div ref={lowerCardsRef} className="flex items-center justify-center gap-5 mt-16">
+        <div ref={lowerCardsRef} className="flex flex-wrap items-center justify-center gap-5 mt-16 w-full">
           <div className="w-[180px] h-[220px] rounded-2xl bg-[#0a0a0a] p-5 shadow-2xl border border-white/10 flex flex-col justify-between will-change-transform">
             <span className="text-[8px] font-mono text-white/30 tracking-wider uppercase">MRV Dashboard</span>
             <div className="flex items-end gap-0.5 h-16">
@@ -216,6 +197,7 @@ export const TrustProblem = () => {
             </div>
           </div>
         </div>
+
       </div>
     </section>
   )

@@ -1,4 +1,9 @@
 import { useRef } from 'react'
+import gsap from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { useGSAP } from '@gsap/react'
+
+gsap.registerPlugin(ScrollTrigger)
 
 const footerLinks = {
   Solutions: ['Carbon MRV', 'Biodiversity', 'Water Stewardship', 'Reporting Suite'],
@@ -10,9 +15,63 @@ const footerLinks = {
 export const Footer = () => {
   const ref = useRef<HTMLDivElement>(null)
 
+  useGSAP(() => {
+    // 1. Slow, staggered entrance for the columns
+    const columns = ref.current?.querySelectorAll('.footer-col')
+    if (columns) {
+      gsap.fromTo(columns,
+        { opacity: 0, y: 80 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 1.8,
+          stagger: 0.15,
+          ease: 'power4.out',
+          scrollTrigger: {
+            trigger: ref.current,
+            start: 'top 85%',
+          }
+        }
+      )
+    }
+
+    // 2. Slow fade in for the bottom bar
+    const bottomBar = ref.current?.querySelector('.footer-bottom')
+    if (bottomBar) {
+      gsap.fromTo(bottomBar,
+        { opacity: 0, y: 30 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 1.5,
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: ref.current,
+            start: 'top 90%',
+          }
+        }
+      )
+    }
+
+    // 3. Very subtle parallax on the whole footer background
+    gsap.fromTo(ref.current,
+      { y: 50 },
+      {
+        y: 0,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: ref.current,
+          start: 'top bottom',
+          end: 'bottom bottom',
+          scrub: true,
+        }
+      }
+    )
+
+  }, { scope: ref })
 
   return (
-    <footer ref={ref} className="relative overflow-hidden">
+    <footer ref={ref} className="relative overflow-hidden z-20">
 
       {/* ── STANDARD FOOTER CONTENT (dark bg) ──────────────────────── */}
       <div className="bg-[#0a0a0a] border-t border-white/[0.06]">
@@ -20,7 +79,7 @@ export const Footer = () => {
           <div className="grid grid-cols-2 md:grid-cols-5 gap-12 mb-24">
 
             {/* Brand column */}
-            <div className="col-span-2 md:col-span-1">
+            <div className="col-span-2 md:col-span-1 footer-col will-change-transform">
               <div className="flex items-center gap-2 mb-6">
                 <div className="w-7 h-7 rounded-full bg-[#a3e635] flex items-center justify-center">
                   <div className="w-2.5 h-2.5 rounded-full bg-[#0a0a0a]" />
@@ -45,7 +104,7 @@ export const Footer = () => {
 
             {/* Link columns */}
             {Object.entries(footerLinks).map(([group, links]) => (
-              <div key={group}>
+              <div key={group} className="footer-col will-change-transform">
                 <div className="text-[9.5px] font-mono tracking-[0.22em] text-white/25 uppercase mb-6">{group}</div>
                 <ul className="space-y-3.5">
                   {links.map((link) => (
@@ -64,9 +123,9 @@ export const Footer = () => {
           </div>
 
           {/* Bottom bar */}
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4 pt-8 border-t border-white/[0.06]">
-            <p className="text-[10.5px] font-mono text-white/20">
-              © 2024 Alethia Environmental Intelligence. All rights reserved.
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4 pt-8 border-t border-white/[0.06] footer-bottom will-change-transform">
+            <p className="text-[10.5px] font-mono text-white">
+              © {new Date().getFullYear()} Alethia Environmental Intelligence. All rights reserved.
             </p>
             <div className="flex gap-8">
               {['Privacy Policy', 'Terms of Service', 'Cookie Settings'].map((l) => (
@@ -78,9 +137,6 @@ export const Footer = () => {
           </div>
         </div>
       </div>
-
-      {/* ── GIANT FOREST FOOTER — Frame 19 ──────────────────────────── */}
-
     </footer>
   )
 }

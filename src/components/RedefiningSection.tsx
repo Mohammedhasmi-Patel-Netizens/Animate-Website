@@ -30,54 +30,57 @@ export const RedefiningSection = () => {
   const gridRef = useRef<HTMLDivElement>(null)
 
   useGSAP(() => {
-    // Header sweep in
-    gsap.fromTo(headerRef.current,
-      { opacity: 0, y: 60, scale: 0.95 },
-      {
-        opacity: 1, y: 0, scale: 1,
-        duration: 1.2,
-        ease: 'power3.out',
-        scrollTrigger: {
-          trigger: containerRef.current,
-          start: 'top 80%',
-        }
-      }
-    )
-
-    // Grid items stagger and parallax
-    const gridItems = gridRef.current?.children ? Array.from(gridRef.current.children) : []
-    
-    gsap.fromTo(gridItems,
-      { opacity: 0, y: 80, rotateX: 10 },
-      {
-        opacity: 1, y: 0, rotateX: 0,
-        duration: 1,
-        stagger: 0.15,
-        ease: 'power3.out',
-        scrollTrigger: {
-          trigger: gridRef.current,
-          start: 'top 85%',
-        }
-      }
-    )
-
-    // Scrub parallax on the grid itself
-    gsap.to(gridRef.current, {
-      y: -60,
-      ease: 'none',
+    // --- Cinematic Pinned Scroll Scrubbing ---
+    const tl = gsap.timeline({
       scrollTrigger: {
         trigger: containerRef.current,
-        start: 'top bottom',
-        end: 'bottom top',
-        scrub: true,
+        start: 'top top',
+        end: '+=200%', // Pin for 2 viewport heights
+        pin: true,
+        scrub: 1.5, // Buttery smooth scrubbing
       }
+    })
+
+    const gridItems = gridRef.current?.children ? Array.from(gridRef.current.children) : []
+
+    // 1. Initial States
+    gsap.set(headerRef.current, { opacity: 0, y: 100, scale: 1.1, filter: 'blur(15px)' })
+    gsap.set(gridItems, { opacity: 0, y: window.innerHeight, z: -400, rotateX: 30, scale: 0.8 })
+
+    // 2. Phase 1: Header cinematic slam
+    tl.to(headerRef.current, {
+      opacity: 1, 
+      y: 0, 
+      scale: 1, 
+      filter: 'blur(0px)',
+      duration: 1.5,
+      ease: 'power4.out',
+    })
+
+    // 3. Phase 2: Grid items swooping in 3D stagger
+    tl.to(gridItems, {
+      opacity: 1,
+      y: 0,
+      z: 0,
+      rotateX: 0,
+      scale: 1,
+      duration: 2,
+      stagger: 0.2, // Sequential stagger for each box
+      ease: 'power3.out',
+    }, '-=0.5') // overlap with header
+
+    // 4. Phase 3: Gentle parallax drift to end
+    tl.to([headerRef.current, ...gridItems], {
+      y: -40,
+      duration: 1.5,
+      ease: 'none',
     })
 
   }, { scope: containerRef })
 
   return (
-    <section ref={containerRef} className="relative z-10 bg-[#f5f5f3] py-32 overflow-hidden perspective-[1000px]">
-      <div className="max-w-[1100px] mx-auto px-8 md:px-16">
+    <section ref={containerRef} className="relative z-10 bg-[#f5f5f3] h-screen w-full flex items-center justify-center overflow-hidden perspective-[1200px]">
+      <div className="max-w-[1100px] w-full mx-auto px-8 md:px-16 flex flex-col items-center justify-center">
 
         {/* Headline */}
         <h2 
@@ -85,25 +88,26 @@ export const RedefiningSection = () => {
           className="text-[clamp(2rem,4.5vw,3.5rem)] font-bold tracking-[-0.03em] leading-[1.08] text-[#0a0a0a] text-center mb-20 will-change-transform"
         >
           We're Not Just Evolving the System.<br />
-          <span className="text-[#0a0a0a]">We're Redefining It.</span>
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#74a822] to-[#a3e635]">We're Redefining It.</span>
         </h2>
 
         {/* 2×2 Grid */}
-        <div ref={gridRef} className="grid grid-cols-1 md:grid-cols-2 gap-6 will-change-transform">
+        <div ref={gridRef} className="grid grid-cols-1 md:grid-cols-2 gap-6 will-change-transform w-full">
           {points.map((p) => (
             <div
               key={p.num}
-              className="flex items-start gap-5 p-8 rounded-2xl bg-white border border-black/[0.06] hover:shadow-lg transition-shadow duration-500 will-change-transform"
+              className="flex items-start gap-5 p-8 rounded-2xl bg-white border border-black/[0.06] shadow-[0_10px_30px_rgba(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.08)] transition-shadow duration-500 will-change-transform"
             >
-              <span className="shrink-0 w-10 h-10 rounded-full bg-[#a3e635] flex items-center justify-center text-[12px] font-bold text-[#0a0a0a]">
+              <span className="shrink-0 w-12 h-12 rounded-full bg-[#a3e635] flex items-center justify-center text-[13px] font-bold text-[#0a0a0a] shadow-inner">
                 {p.num}
               </span>
-              <p className="text-[15px] leading-[1.7] text-[#0a0a0a]/70 font-medium pt-2">
+              <p className="text-[16px] leading-[1.7] text-[#0a0a0a]/70 font-medium pt-3">
                 {p.text}
               </p>
             </div>
           ))}
         </div>
+
       </div>
     </section>
   )

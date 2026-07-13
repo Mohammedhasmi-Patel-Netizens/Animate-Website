@@ -35,90 +35,108 @@ export const NewsInsights = () => {
   const articlesRef = useRef<HTMLDivElement>(null)
 
   useGSAP(() => {
-    // Header sweep
+    // --- Cinematic Pinned Scroll Scrubbing ---
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: containerRef.current,
+        start: 'top top',
+        end: '+=200%', // Pin for 2 viewport heights
+        pin: true,
+        scrub: 1.5, // Buttery smooth scrubbing
+      }
+    })
+
     const headerElements = headerRef.current?.children ? Array.from(headerRef.current.children) : []
-    gsap.fromTo(headerElements,
-      { opacity: 0, y: 50 },
-      {
-        opacity: 1, y: 0,
-        duration: 1,
-        stagger: 0.15,
-        ease: 'power3.out',
-        scrollTrigger: {
-          trigger: containerRef.current,
-          start: 'top 80%',
-        }
-      }
-    )
-
-    // Staggered articles entrance
     const articlesArray = articlesRef.current?.children ? Array.from(articlesRef.current.children) : []
-    gsap.fromTo(articlesArray,
-      { opacity: 0, y: 120, scale: 0.95 },
-      {
-        opacity: 1, y: 0, scale: 1,
-        duration: 1.2,
-        stagger: 0.2,
-        ease: 'back.out(1.2)',
-        scrollTrigger: {
-          trigger: articlesRef.current,
-          start: 'top 85%',
-        }
-      }
-    )
 
-    // Inner image parallax
+    // 1. Initial States
+    gsap.set(headerElements, { opacity: 0, y: 80, scale: 0.95, filter: 'blur(10px)' })
+    gsap.set(articlesArray, { opacity: 0, y: window.innerHeight, z: -500, rotateX: 25, rotateY: 'random(-10, 10)', scale: 0.85 })
+
+    // 2. Phase 1: Header reveals
+    tl.to(headerElements, {
+      opacity: 1, 
+      y: 0, 
+      scale: 1, 
+      filter: 'blur(0px)',
+      duration: 1.2,
+      stagger: 0.2,
+      ease: 'power3.out',
+    })
+
+    // 3. Phase 2: Articles swoop in 3D stagger
+    tl.to(articlesArray, {
+      opacity: 1,
+      y: 0,
+      z: 0,
+      rotateX: 0,
+      rotateY: 0,
+      scale: 1,
+      duration: 2,
+      stagger: 0.25,
+      ease: 'power4.out',
+    }, '-=0.5') // overlap with header
+
+    // 4. Inner image parallax
     articlesArray.forEach((article) => {
       const img = article.querySelector('img')
       if (img) {
-        gsap.fromTo(img, 
-          { y: -30 },
+        tl.fromTo(img, 
+          { y: -30, scale: 1.1 },
           {
             y: 30,
+            scale: 1.05,
+            duration: 4, // runs alongside the whole timeline
             ease: 'none',
-            scrollTrigger: {
-              trigger: article,
-              start: 'top bottom',
-              end: 'bottom top',
-              scrub: true,
-            }
-          }
+          }, 0
         )
       }
     })
 
+    // 5. Phase 3: Final gentle drift to finish the pin
+    tl.to([...headerElements, ...articlesArray], {
+      y: -50,
+      duration: 1.5,
+      ease: 'none',
+    })
+
+    // Force a refresh to ensure pinned heights are calculated correctly (often an issue with Vite HMR)
+    setTimeout(() => {
+      ScrollTrigger.refresh()
+    }, 100)
+
   }, { scope: containerRef })
 
   return (
-    <section ref={containerRef} className="relative z-10 bg-[#f5f5f3] py-32 overflow-hidden border-t border-black/[0.06]">
-      <div className="max-w-[1400px] mx-auto px-8 md:px-16">
+    <section ref={containerRef} className="relative z-10 bg-[#f5f5f3] h-screen w-full flex items-center justify-center overflow-hidden border-t border-black/[0.06] perspective-[1200px]">
+      <div className="max-w-[1400px] w-full mx-auto px-8 md:px-16 flex flex-col items-center justify-center relative">
 
         {/* Header */}
-        <div ref={headerRef}>
+        <div ref={headerRef} className="text-center mb-16 w-full flex flex-col items-center">
           <span className="inline-block mb-6 text-[10px] font-mono tracking-[0.28em] text-[#a3e635] uppercase">
             Latest News & Insights
           </span>
-          <h2 className="text-[clamp(2rem,4.5vw,3.5rem)] font-bold tracking-[-0.03em] leading-[1.08] text-[#0a0a0a] mb-16">
+          <h2 className="text-[clamp(2rem,4.5vw,3.5rem)] font-bold tracking-[-0.03em] leading-[1.08] text-[#0a0a0a] max-w-[800px]">
             Insights that Move the Market.
           </h2>
         </div>
 
         {/* Articles grid */}
-        <div ref={articlesRef} className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div ref={articlesRef} className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full perspective-[1000px]">
           {articles.map((article) => (
             <article
               key={article.title}
               className="group cursor-pointer will-change-transform"
             >
               {/* Image */}
-              <div className="rounded-2xl overflow-hidden mb-6 h-[220px]">
+              <div className="rounded-2xl overflow-hidden mb-6 h-[220px] shadow-[0_10px_30px_rgba(0,0,0,0.04)] group-hover:shadow-[0_20px_50px_rgba(0,0,0,0.12)] transition-shadow duration-700">
                 <img
                   src={article.img}
                   alt={article.title}
-                  className="w-full h-[130%] object-cover group-hover:scale-105 transition-transform duration-700"
+                  className="w-full h-[130%] object-cover group-hover:scale-110 transition-transform duration-700"
                 />
                 <div className="relative -mt-[220px] p-4 z-10">
-                  <span className="inline-block px-3 py-1 rounded-full bg-[#0a0a0a]/80 backdrop-blur-sm text-[8px] font-mono tracking-[0.2em] text-white uppercase">
+                  <span className="inline-block px-3 py-1 rounded-full bg-[#0a0a0a]/80 backdrop-blur-sm text-[8px] font-mono tracking-[0.2em] text-white uppercase shadow-sm">
                     {article.tag}
                   </span>
                 </div>
@@ -128,7 +146,7 @@ export const NewsInsights = () => {
               <span className="text-[10px] font-mono text-[#0a0a0a]/30 tracking-wider uppercase mb-3 block">
                 {article.date}
               </span>
-              <h3 className="text-[1.15rem] font-bold leading-[1.3] tracking-[-0.01em] text-[#0a0a0a] mb-3 group-hover:text-[#0a0a0a]/60 transition-colors duration-300">
+              <h3 className="text-[1.15rem] font-bold leading-[1.3] tracking-[-0.01em] text-[#0a0a0a] mb-3 group-hover:text-[#a3e635] transition-colors duration-300">
                 {article.title}
               </h3>
               <p className="text-[13px] leading-[1.7] text-[#0a0a0a]/40 mb-5">
@@ -140,6 +158,7 @@ export const NewsInsights = () => {
             </article>
           ))}
         </div>
+        
       </div>
     </section>
   )
