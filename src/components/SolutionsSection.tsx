@@ -27,13 +27,12 @@ export const SolutionsSection = () => {
     window.addEventListener('mousemove', handleMouseMove)
 
     // --- Cinematic Scroll Scrubbing ---
-    // 1. Entrance timeline (ends exactly at top top to ensure full load on anchor jump)
+    // 1. Entrance timeline (plays naturally to completion once section enters viewport)
     const entranceTl = gsap.timeline({
       scrollTrigger: {
         trigger: containerRef.current,
         start: 'top 85%', 
-        end: 'top top', 
-        scrub: 1,
+        toggleActions: 'play none none none',
       }
     })
 
