@@ -112,7 +112,7 @@ export const StorySection = () => {
             <span className="inline-block mb-6 px-4 py-1.5 rounded-full border border-[#a3e635]/25 text-[#a3e635] text-[9.5px] font-mono tracking-[0.24em] uppercase">
               Our Story
             </span>
-            <h2 className="text-[clamp(2.5rem,6vw,5rem)] font-bold leading-[1.06] tracking-[-0.03em] text-white mb-8">
+            <h2 className="text-[clamp(1.8rem,5vw,5rem)] font-bold leading-[1.06] tracking-[-0.03em] text-white mb-8">
               From Data Chaos to<br />
               <span className="text-[#a3e635]">Science-Backed,</span><br />
               Actionable Insights
@@ -124,7 +124,7 @@ export const StorySection = () => {
         </div>
 
         {/* Rotating center rock */}
-        <div className="absolute z-20 w-[500px] h-[500px] md:w-[700px] md:h-[700px] pointer-events-none flex items-center justify-center">
+        <div className="absolute z-20 w-[280px] h-[280px] sm:w-[450px] sm:h-[450px] lg:w-[700px] lg:h-[700px] pointer-events-none flex items-center justify-center">
           <img
             ref={rockCenterRef}
             src="/rock-center.png"
@@ -136,12 +136,12 @@ export const StorySection = () => {
         <img
           ref={rockLeftRef}
           src="/rock-left.png"
-          className="absolute left-[4%] bottom-[10%] w-[260px] z-30"
+          className="absolute left-[4%] bottom-[10%] w-[120px] sm:w-[200px] md:w-[260px] z-30"
         />
         <img
           ref={rockRightRef}
           src="/rock-right.png"
-          className="absolute right-[4%] top-[15%] w-[200px] z-30"
+          className="absolute right-[4%] top-[15%] w-[100px] sm:w-[150px] md:w-[200px] z-30"
         />
       </div>
     </section>

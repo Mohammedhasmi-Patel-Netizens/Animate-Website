@@ -67,7 +67,7 @@ export const Hero = () => {
               {/* Headline */}
               <motion.h1
                 variants={fadeUp}
-                className="text-[clamp(2.8rem,6vw,5.5rem)] font-bold leading-[1.02] tracking-[-0.03em] text-white mb-8"
+                className="text-[clamp(2.2rem,6vw,5.5rem)] font-bold leading-[1.02] tracking-[-0.03em] text-white mb-8"
               >
                 Where Ecosystem
                 <br />
@@ -96,7 +96,7 @@ export const Hero = () => {
               </motion.p>
 
               {/* Stats row */}
-              <motion.div variants={fadeUp} className="mt-12 flex items-center gap-10 border-t border-white/[0.07] pt-10">
+              <motion.div variants={fadeUp} className="mt-12 flex flex-wrap items-center gap-x-10 gap-y-6 border-t border-white/[0.07] pt-10">
                 {[
                   { val: '2.4M+', label: 'tCO₂e Verified' },
                   { val: '99.9%', label: 'Data Accuracy' },
@@ -111,17 +111,17 @@ export const Hero = () => {
             </motion.div>
 
             {/* HUD OVERLAYS & ROCKS */}
-            <div className="relative h-[600px] lg:h-[700px] pointer-events-none">
+            <div className="relative h-[450px] sm:h-[550px] lg:h-[700px] pointer-events-none">
               {/* Rock 1 — big center */}
-              <div className="absolute top-[5%] right-[5%] w-[340px] float-1 drop-shadow-2xl z-10 pointer-events-auto cursor-pointer">
+              <div className="absolute top-[5%] right-[5%] w-[220px] sm:w-[280px] lg:w-[340px] float-1 drop-shadow-2xl z-10 pointer-events-auto cursor-pointer">
                 <img src="/rocks.png" alt="Mossy ecosystem rock" className="w-full h-full object-contain mix-blend-screen" />
               </div>
               {/* Rock 2 — bottom left offset */}
-              <div className="absolute bottom-[5%] left-[0%] w-[200px] float-2 drop-shadow-2xl z-0 opacity-80 pointer-events-auto cursor-pointer">
+              <div className="absolute bottom-[5%] left-[0%] w-[130px] sm:w-[170px] lg:w-[200px] float-2 drop-shadow-2xl z-0 opacity-80 pointer-events-auto cursor-pointer">
                 <img src="/rock-left.png" alt="Gray rock" className="w-full h-full object-contain mix-blend-screen" />
               </div>
               {/* Rock 3 — small top accent */}
-              <div className="absolute top-[30%] left-[10%] w-[130px] float-1 drop-shadow-2xl opacity-70 pointer-events-auto cursor-pointer" style={{ animationDelay: '2s' }}>
+              <div className="absolute top-[30%] left-[10%] w-[90px] sm:w-[110px] lg:w-[130px] float-1 drop-shadow-2xl opacity-70 pointer-events-auto cursor-pointer" style={{ animationDelay: '2s' }}>
                 <img src="/rock-right.png" alt="Accent rock" className="w-full h-full object-contain mix-blend-screen" />
               </div>
 
@@ -129,23 +129,23 @@ export const Hero = () => {
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 1.2, duration: 1 }}
-                className="absolute top-[18%] left-[0%] glass px-4 py-3 rounded-xl text-left pointer-events-auto"
+                className="absolute top-[18%] left-[2%] glass px-3 py-2 sm:px-4 sm:py-3 rounded-xl text-left pointer-events-auto"
               >
-                <div className="text-[9px] font-mono tracking-widest text-white/40 uppercase mb-1">CO₂ Flux</div>
-                <div className="text-[22px] font-mono font-bold text-[#a3e635] leading-none">-2.41</div>
-                <div className="text-[9px] font-mono text-white/40 mt-1">tCO₂e / ha / yr</div>
+                <div className="text-[8px] sm:text-[9px] font-mono tracking-widest text-white/40 uppercase mb-1">CO₂ Flux</div>
+                <div className="text-[18px] sm:text-[22px] font-mono font-bold text-[#a3e635] leading-none">-2.41</div>
+                <div className="text-[8px] sm:text-[9px] font-mono text-white/40 mt-1">tCO₂e / ha / yr</div>
               </motion.div>
 
               <motion.div
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 1.5, duration: 1 }}
-                className="absolute bottom-[20%] right-[2%] glass px-4 py-3 rounded-xl text-left pointer-events-auto"
+                className="absolute bottom-[20%] right-[2%] glass px-3 py-2 sm:px-4 sm:py-3 rounded-xl text-left pointer-events-auto"
               >
-                <div className="text-[9px] font-mono tracking-widest text-white/40 uppercase mb-1">Blockchain</div>
-                <div className="flex items-center gap-2 mt-1">
-                  <span className="w-2 h-2 rounded-full bg-[#a3e635] animate-pulse" />
-                  <span className="text-[11px] font-mono text-white">Verified ✓</span>
+                <div className="text-[8px] sm:text-[9px] font-mono tracking-widest text-white/40 uppercase mb-1">Blockchain</div>
+                <div className="flex items-center gap-1.5 sm:gap-2 mt-1">
+                  <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-[#a3e635] animate-pulse" />
+                  <span className="text-[10px] sm:text-[11px] font-mono text-white">Verified ✓</span>
                 </div>
               </motion.div>
 
@@ -153,7 +153,7 @@ export const Hero = () => {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 2.5, duration: 1 }}
-                className="absolute bottom-4 right-4 flex items-center gap-2"
+                className="hidden lg:flex absolute bottom-4 right-4 items-center gap-2"
               >
                 <span className="w-1.5 h-1.5 rounded-full bg-[#a3e635]" />
                 <span className="text-[10px] uppercase tracking-widest text-white/30 font-mono">Scroll to discover</span>
